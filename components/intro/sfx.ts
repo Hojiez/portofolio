@@ -86,8 +86,11 @@ function tone(
 /** Bunyi pembuka: dengung rendah yang naik saat kotak logam bergoyang, desis
  *  kilau saat kilaunya menyapu, dan dua denting kecil saat menjadi terminal. */
 export function sfxBlob() {
-  const a = ready();
-  if (!a) return;
+  // dipicu langsung oleh klik tombol gerbang: aktifkan audio dulu bila perlu
+  onGesture((a) => blob(a));
+}
+
+function blob(a: Audio) {
   const { c, out } = a;
   const t = c.currentTime;
   // dengung "whoom" sepanjang blob mengembang

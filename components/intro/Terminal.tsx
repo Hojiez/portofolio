@@ -132,7 +132,11 @@ export function Terminal() {
   const [released, setReleased] = useState(false);
   // "loading": Mochi + cincin berputar sambil aset dimuat; "intro": kotak
   // logam cair lalu terminal.
-  const [phase, setPhase] = useState<"loading" | "intro">("loading");
+  // "gate": aset siap, menunggu pengunjung memilih masuk dengan/tanpa suara.
+  const [phase, setPhase] = useState<"loading" | "gate" | "intro">("loading");
+  const phaseRef = useRef<"loading" | "gate" | "intro">("loading");
+  const startRef = useRef<(() => void) | null>(null);
+  const gateRef = useRef<HTMLButtonElement>(null);
   const [load, setLoad] = useState(0); // persen aset yang sudah dimuat
   const [loaderLook, setLoaderLook] = useState<MascotLook>({ x: 0, y: 0 });
   const [metalDone, setMetalDone] = useState(false); // shader kotak logam boleh dilepas
@@ -198,6 +202,8 @@ export function Terminal() {
       }, wait);
     };
 
+    // Dipanggil dari klik tombol gerbang (lihat enter() di bawah). Klik itu
+    // juga yang membuat browser mengizinkan suara diputar.
     const startIntro = () => {
       if (cancelled) return;
       setPhase("intro");
@@ -215,11 +221,14 @@ export function Terminal() {
       run();
     };
 
-    // Loading screen: tampil minimal sebentar supaya animasi kotak -> lingkaran
-    // sempat terlihat, dan selesai saat semua aset siap.
+    // Loading screen: tampil minimal sebentar supaya Mochi dan cincinnya sempat
+    // terlihat, lalu berubah jadi gerbang dua tombol saat semua aset siap.
+    startRef.current = startIntro;
     const minShow = new Promise((r) => window.setTimeout(r, reducedMotion() ? 300 : 1600));
     void Promise.all([preloadIntroAssets((d, t) => !cancelled && setLoad(Math.round((d / t) * 100))), minShow]).then(
-      startIntro
+      () => {
+        if (!cancelled) setPhase("gate");
+      }
     );
 
     return () => {
@@ -249,17 +258,36 @@ export function Terminal() {
     };
   }, []);
 
-  // Enter menutup intro (kecuali saat fokus di tombol lain: tombol itu yang menangani).
+  /* Masuk dari gerbang: simpan pilihan suara, buka izin audio browser (klik
+     ini adalah interaksi pengunjung), lalu mulai kotak logam dan terminal. */
+  const enter = useCallback((withSound: boolean) => {
+    if (phaseRef.current !== "gate") return;
+    phaseRef.current = "intro";
+    setSoundOn(withSound);
+    unlockAudio();
+    if (withSound) sfxToggleOn();
+    startRef.current?.();
+  }, []);
+
+  useEffect(() => {
+    phaseRef.current = phase;
+    // gerbang muncul: fokus ke tombol utama supaya pengguna keyboard siap
+    if (phase === "gate") gateRef.current?.focus({ preventScroll: true });
+  }, [phase]);
+
+  // Enter: di gerbang = masuk dengan suara; di terminal = menutup intro
+  // (kecuali saat fokus di tombol lain: tombol itu yang menangani).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Enter") return;
       if (e.target instanceof HTMLButtonElement && e.target !== enterRef.current) return;
       e.preventDefault();
-      close();
+      if (phaseRef.current === "gate") enter(true);
+      else if (phaseRef.current === "intro") close();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [close]);
+  }, [close, enter]);
 
   // Fokus ke tombol Enter begitu muncul, supaya pengguna keyboard langsung siap.
   useEffect(() => {
@@ -285,25 +313,52 @@ export function Terminal() {
 
       {/* Loading screen: Mochi dengan cincin logam yang berputar di sekelilingnya,
           sambil suara dan aset dimuat */}
-      <div
-        role="status"
-        aria-label={`Loading ${load}%`}
-        className="intro-loader pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center gap-6"
-      >
+      <div className="intro-loader pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center gap-6">
         <div className="relative flex h-40 w-40 items-center justify-center">
           <div aria-hidden="true" className="loader-ring absolute inset-0 rounded-full" />
           <div className="loader-bob">
             {/* dilepas setelah loading memudar, supaya tidak memakai WebGL lagi */}
             {!metalDone ? (
-              <Mascot size={96} expression="idle" look={loaderLook} lite />
+              <Mascot
+                size={96}
+                expression={phase === "loading" ? "idle" : "happy"}
+                look={phase === "loading" ? loaderLook : { x: 0, y: 0.35 }}
+                lite
+              />
             ) : (
               <span className="block h-24 w-24" />
             )}
           </div>
         </div>
-        <p aria-hidden="true" className="font-[family-name:var(--font-mono)] text-xs tracking-[0.2em] text-muted">
-          LOADING {String(load).padStart(3, " ")}%
-        </p>
+
+        {phase === "loading" ? (
+          <p role="status" className="font-[family-name:var(--font-mono)] text-xs tracking-[0.2em] text-muted">
+            LOADING {String(load).padStart(3, " ")}%
+          </p>
+        ) : (
+          // Gerbang: klik di sini membuat browser mengizinkan suara, jadi
+          // semua bunyi intro langsung terdengar.
+          <div className="gate-in pointer-events-auto flex flex-col items-center gap-3">
+            <p className="font-[family-name:var(--font-mono)] text-xs tracking-[0.2em] text-muted">BEST WITH SOUND ON</p>
+            <div className="flex flex-wrap justify-center gap-2">
+              <button
+                ref={gateRef}
+                type="button"
+                onClick={() => enter(true)}
+                className={`metal-button rounded-full px-5 py-2.5 text-sm font-semibold ${FOCUS}`}
+              >
+                Enter with sound
+              </button>
+              <button
+                type="button"
+                onClick={() => enter(false)}
+                className={`rounded-full border border-line bg-surface/80 px-5 py-2.5 text-sm text-muted transition-colors hover:text-fg ${FOCUS}`}
+              >
+                Enter without sound
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="relative flex flex-1 items-center justify-center px-4">
