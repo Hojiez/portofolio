@@ -10,7 +10,7 @@ Dokumen ini adalah acuan tunggal untuk merombak portofolio. Setiap fase di bagia
 
 ## 1. Konsep
 
-Pengunjung tidak "membaca" portofolio, mereka **ditemani**. Seekor maskot husky-blob memandu dari atas ke bawah dan mengomentari tiap section dengan gaya jahil, seolah-olah ia AI assistant. Sebenarnya semua kalimatnya naskah yang ditulis tangan.
+Pengunjung tidak "membaca" portofolio, mereka **ditemani**. Maskot berupa blob logam berwajah memandu dari atas ke bawah dan mengomentari tiap section dengan gaya jahil, seolah-olah ia AI assistant. Sebenarnya semua kalimatnya naskah yang ditulis tangan.
 
 Alur pengalaman:
 
@@ -21,7 +21,7 @@ Alur pengalaman:
 
 Yang **diambil** dari referensi: intro terminal, pemandu bernaskah yang berpindah per section, teks muncul kata demi kata, tombol suara, tombol "Skip intro".
 
-Yang **sengaja dibedakan**: latar gelap (referensi putih), maskot husky-blob buatan sendiri (bukan kepala 3D), naskah dan nama sendiri, suara text-to-speech.
+Yang **sengaja dibedakan**: latar gelap (referensi putih), maskot blob logam buatan sendiri (bukan kepala 3D), naskah dan nama sendiri, suara text-to-speech.
 
 ---
 
@@ -30,7 +30,7 @@ Yang **sengaja dibedakan**: latar gelap (referensi putih), maskot husky-blob bua
 | Hal | Keputusan |
 |---|---|
 | Bahasa pemandu | Inggris |
-| Wujud maskot | Husky bergaya blob, halus (bukan pixel art) |
+| Wujud maskot | Blob logam mengilap dengan wajah lucu (awalnya husky-blob, diganti di Fase 3) |
 | Latar | Gelap dengan sentuhan metalik |
 | Suara | Text-to-speech untuk kalimat maskot |
 | Nama pemilik | Rauh. Nama panggilan: Hessed. Maskot memanggilnya "Rauh" |
@@ -53,7 +53,7 @@ Yang **sengaja dibedakan**: latar gelap (referensi putih), maskot husky-blob bua
 | `--text` | `#e7e9ec` | Teks utama |
 | `--muted` | `#8b9099` | Teks sekunder |
 | `--metal-1` / `--metal-2` | `#f2f4f7` → `#6d737d` | Gradien metalik untuk judul besar |
-| `--accent` | `#8fd8ff` | Biru es (warna mata husky), dipakai hemat |
+| `--accent` | `#8fd8ff` | Biru es, dipakai hemat |
 
 **Yang diganti dari desain sekarang:** tiga orb biru yang melayang dan grid tipis di latar. Biru elektrik `#2d7bff` tidak lagi menjadi warna dominan.
 
@@ -102,9 +102,9 @@ Aturan:
 
 ## 5. Maskot
 
-**Wujud:** husky yang disederhanakan menjadi bentuk blob. Badan membulat seperti tetesan, dua telinga segitiga tumpul, topeng wajah khas husky (putih di tengah, abu gelap di luar), mata biru es. Tanpa kaki yang detail.
+**Wujud:** blob oval dari logam cair yang mengilap seperti krom, dengan wajah sederhana: dua mata hitam bulat berkilau dan mulut kecil. Satu keluarga dengan bola logam di hero. (Rencana awal husky-blob diganti di Fase 3 atas pilihan pemilik.)
 
-**Teknik:** SVG, dianimasikan dengan CSS/JS. Ringan, tajam di semua ukuran, dan mudah diberi ekspresi. Versi 3D tidak masuk rencana ini.
+**Teknik:** badan memakai shader liquid metal yang sama dengan hero (`MetalShader` dengan tampilan `soft`, lebih cerah dan halus supaya wajah terbaca), dipipihkan jadi oval. Wajah berupa SVG di atasnya dengan garis terang tipis supaya tetap terbaca di atas pantulan gelap. Tanpa WebGL atau dengan prefers-reduced-motion, badan memakai cakram logam CSS. Kode: `components/guide/Mascot.tsx`, daftar ekspresi di `components/guide/expressions.ts`, animasi di `app/globals.css` bagian MOCHI.
 
 **Ekspresi yang dibutuhkan (6):**
 
@@ -117,7 +117,7 @@ Aturan:
 | `curious` | Kepala miring, saat pengunjung mengarahkan kursor ke project |
 | `sleep` | Pengunjung diam lebih dari ±30 detik |
 
-**Interaksi:** klik maskot untuk reaksi kecil (melompat, menggonggong pelan jika suara aktif). Di HP, maskot menempel di pojok bawah supaya tidak menutupi isi.
+**Interaksi:** klik maskot untuk reaksi kecil (memantul seperti jeli, bunyi "boing" pelan jika suara aktif). Di HP, maskot menempel di pojok bawah supaya tidak menutupi isi.
 
 ---
 
@@ -149,7 +149,7 @@ Aturan:
 |---|---|---|
 | `intro` | "Oh, a visitor! I'm Mochi. Press Enter and I'll show you around." | `happy` |
 | `hero` | "That's Rauh. Everyone calls him Hessed. He made me, so I have to say nice things." | `smug` |
-| `about` | "This is where he talks about himself. I'd skim it, but I'm a dog." | `talk` |
+| `about` | "This is where he talks about himself. I'd skim it, but I'm a blob of liquid metal." | `talk` |
 | `projects` | "Seven things he built. One of them is three furniture stores in a trench coat." | `smug` |
 | `skills` | "The tools he uses. I can't use any of them. No thumbs." | `curious` |
 | `contact` | "That's the tour. If you liked it, email him. If you didn't, it was my fault." | `happy` |
@@ -189,7 +189,7 @@ content/
   script.ts             naskah maskot
 components/
   intro/Terminal.tsx
-  guide/Mascot.tsx      SVG + ekspresi
+  guide/Mascot.tsx      badan shader logam + wajah SVG + ekspresi
   guide/Guide.tsx       logika kursi, scroll, balon teks
   guide/useVoice.ts     pemutar suara + tombol
   sections/Hero.tsx, About.tsx, Projects.tsx, Skills.tsx, Contact.tsx
@@ -219,7 +219,7 @@ Setiap fase menghasilkan situs yang tetap bisa dijalankan.
 | **0. Fondasi** | Pecah `page.tsx` ke struktur di bagian 8, pindahkan data ke `content/`. Tampilan tidak berubah. | Halaman terlihat sama persis, `npm run build` lolos |
 | **1. Visual dasar** | Token warna baru, hapus orb biru, judul metalik, gaya kartu baru, shader di hero | Seluruh section memakai palet baru, tidak ada sisa biru elektrik |
 | **2. Intro terminal** | Komponen terminal, efek ketik, Enter/Skip, `sessionStorage` | Intro tampil sekali per sesi, bisa dilewati, berfungsi di HP |
-| **3. Maskot** | SVG husky-blob dan 6 ekspresi | Semua ekspresi bisa dipicu dari satu halaman uji |
+| **3. Maskot** | Blob logam berwajah dan 6 ekspresi | Semua ekspresi bisa dipicu dari satu halaman uji |
 | **4. Sistem pemandu** | Kursi per section, perpindahan saat scroll, teks kata demi kata, naskah dari `content/script.ts` | Scroll dari atas ke bawah memunculkan 6 kalimat sesuai urutan, tanpa pengulangan |
 | **5. Suara** | File audio, tombol suara, sinkron mulut | Suara menyala dan mati sesuai tombol, tidak pernah berbunyi sebelum interaksi |
 | **6. Isi dan pemolesan** | Lengkapi bio dan angka, interaksi kartu project, transisi antar section | Tidak ada teks contoh yang tersisa |

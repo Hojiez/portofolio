@@ -89,20 +89,17 @@ reload di sesi yang sama, bisa dilewati, dan berfungsi di HP tanpa keyboard.
 Baca docs/MASTER_PLAN.md bagian 5.
 
 Tugas: buat components/guide/Mascot.tsx, maskot bernama Mochi.
-- Wujud: husky yang disederhanakan menjadi blob. Badan membulat, dua telinga
-  segitiga tumpul, topeng wajah husky (putih di tengah, abu gelap di luar),
-  mata biru es. Gaya halus dan bersih, bukan pixel art.
-- Dibuat sebagai SVG inline, digambar sendiri. Jangan meniru karakter yang
-  sudah ada.
+- Wujud: blob oval dari logam cair mengilap seperti krom, dengan dua mata
+  hitam bulat berkilau dan mulut kecil. (Sudah dikerjakan: awalnya husky-blob,
+  lalu diganti ke blob logam.)
+- Badan memakai MetalShader yang sama dengan hero; wajah berupa SVG inline.
+  Jangan meniru karakter yang sudah ada.
 - Props: expression ("idle" | "talk" | "happy" | "smug" | "curious" |
   "sleep") dan size.
 - Animasi: bernapas dan berkedip saat idle, mulut bergerak saat talk,
   perpindahan antar ekspresi halus. Hormati prefers-reduced-motion.
 - Buat halaman uji app/mascot/page.tsx yang menampilkan semua ekspresi
   berdampingan, dengan tombol untuk berpindah ekspresi.
-
-Buat 2-3 variasi bentuk dulu dan tunjukkan kepadaku. Jangan lanjut ke animasi
-sebelum aku memilih salah satunya.
 
 Selesai jika: keenam ekspresi bisa dibedakan dengan jelas di ukuran 64px dan
 160px, di atas latar gelap.
