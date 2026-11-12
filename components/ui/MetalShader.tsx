@@ -1,7 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { INTRO_DONE_EVENT } from "@/components/intro/introState";
 
 /*
  * MetalShader — bola "liquid metal" (WebGL). Dipakai di hero dan sebagai
@@ -28,10 +29,7 @@ function Fallback({ className, scale }: { className: string; scale: number }) {
   );
 }
 
-const LiquidMetal = dynamic(
-  () => import("@paper-design/shaders-react").then((m) => m.LiquidMetal),
-  { ssr: false }
-);
+const LiquidMetal = dynamic(() => import("./LiquidMetalCanvas"), { ssr: false });
 
 // --- Deteksi kemampuan browser (hanya berjalan di browser) ------------------
 
@@ -80,22 +78,60 @@ export function MetalShader({
   look?: keyof typeof LOOKS;
 }) {
   const animate = useSyncExternalStore(subscribeMotion, canAnimate, canAnimateOnServer);
+  const boxRef = useRef<HTMLDivElement>(null);
+  const [ready, setReady] = useState(false);
 
-  if (!animate) return <Fallback className={className} scale={scale} />;
+  // Shader baru dimuat saat kotaknya dekat layar DAN browser sedang senggang,
+  // supaya tidak membebani saat halaman pertama dibuka (Lighthouse: Total
+  // Blocking Time). Sampai saat itu yang tampil cakram CSS.
+  // Shader di halaman (#page) juga menunggu intro ditutup: selama intro tampil
+  // halaman tersembunyi, jadi menyalakan shader di belakangnya hanya membuang
+  // tenaga perangkat.
+  useEffect(() => {
+    const el = boxRef.current;
+    if (!animate || !el) return;
+    let idle: number | undefined;
+    const whenIdle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 300));
+    const cancelIdle = window.cancelIdleCallback ?? window.clearTimeout;
+    const behindIntro = () =>
+      !!el.closest("#page") && document.documentElement.getAttribute("data-intro") === "show";
+    const start = () => {
+      if (behindIntro()) return; // dicoba lagi saat intro ditutup
+      window.removeEventListener(INTRO_DONE_EVENT, start);
+      idle = whenIdle(() => setReady(true), { timeout: 2500 });
+    };
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        io.disconnect();
+        window.addEventListener(INTRO_DONE_EVENT, start);
+        start();
+      },
+      { rootMargin: "200px" }
+    );
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      window.removeEventListener(INTRO_DONE_EVENT, start);
+      if (idle !== undefined) cancelIdle(idle);
+    };
+  }, [animate]);
 
   return (
-    <div aria-hidden="true" className={`relative ${className}`}>
+    <div ref={boxRef} aria-hidden="true" className={`relative ${className}`}>
       {/* cadangan tetap di bawah sampai kanvas shader menutupinya */}
       <Fallback className="absolute inset-0" scale={scale} />
-      <LiquidMetal
-        className="absolute inset-0 h-full w-full"
-        shape="circle"
-        colorBack="#00000000"
-        colorTint="#ffffff"
-        {...LOOKS[look]}
-        scale={scale}
-        speed={speed}
-      />
+      {animate && ready && (
+        <LiquidMetal
+          className="absolute inset-0 h-full w-full"
+          shape="circle"
+          colorBack="#00000000"
+          colorTint="#ffffff"
+          {...LOOKS[look]}
+          scale={scale}
+          speed={speed}
+        />
+      )}
     </div>
   );
 }

@@ -22,11 +22,12 @@ export const SITE = {
   location: "Balikpapan, Indonesia",
   // >>> GANTI DENGAN DATA KAMU: email
   email: "rauhrisqiabdil@gmail.com",
-  // >>> GANTI DENGAN DATA KAMU: file CV — taruh PDF-nya di folder /public
-  cvUrl: "/cv.pdf",
-  // >>> GANTI DENGAN DATA KAMU: path foto — taruh fotonya di folder /public
-  //     (kalau file tidak ada, otomatis diganti kotak berisi inisial nama)
-  photo: "/profile.jpg",
+  // >>> GANTI DENGAN DATA KAMU: file CV — taruh PDF-nya di folder /public lalu
+  //     isi "/cv.pdf". Selama kosong "", tombol CV disembunyikan.
+  cvUrl: "",
+  // >>> GANTI DENGAN DATA KAMU: foto — taruh di folder /public lalu isi
+  //     "/profile.jpg". Selama kosong "", tampil kotak berisi inisial nama.
+  photo: "",
   // >>> GANTI DENGAN DATA KAMU: alamat situs setelah online, misalnya
   //     "https://rauh.vercel.app". Kosongkan "" kalau belum ada.
   url: "",

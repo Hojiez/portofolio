@@ -39,16 +39,18 @@ export function Navbar() {
             <li className="-mx-4">
               <SoundToggle />
             </li>
-            <li>
-              <a
-                href={SITE.cvUrl}
-                download
-                className={`inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition ${METAL_BUTTON} ${FOCUS}`}
-              >
-                <Icon d={ICON.download} />
-                CV
-              </a>
-            </li>
+            {SITE.cvUrl && (
+              <li>
+                <a
+                  href={SITE.cvUrl}
+                  download
+                  className={`inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition ${METAL_BUTTON} ${FOCUS}`}
+                >
+                  <Icon d={ICON.download} />
+                  CV
+                </a>
+              </li>
+            )}
           </ul>
 
           {/* tombol suara + menu HP */}
@@ -84,17 +86,19 @@ export function Navbar() {
                 </a>
               </li>
             ))}
-            <li>
-              <a
-                href={SITE.cvUrl}
-                download
-                onClick={() => setMenuOpen(false)}
-                className={`mt-1 flex items-center justify-center gap-2 rounded-lg px-3 py-3 font-medium ${METAL_BUTTON} ${FOCUS}`}
-              >
-                <Icon d={ICON.download} />
-                Download CV
-              </a>
-            </li>
+            {SITE.cvUrl && (
+              <li>
+                <a
+                  href={SITE.cvUrl}
+                  download
+                  onClick={() => setMenuOpen(false)}
+                  className={`mt-1 flex items-center justify-center gap-2 rounded-lg px-3 py-3 font-medium ${METAL_BUTTON} ${FOCUS}`}
+                >
+                  <Icon d={ICON.download} />
+                  Download CV
+                </a>
+              </li>
+            )}
           </ul>
         )}
       </nav>

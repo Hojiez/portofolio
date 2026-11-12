@@ -204,6 +204,9 @@ Selesai jika: tidak ada teks contoh atau placeholder yang tersisa di situs.
 ```
 Baca docs/MASTER_PLAN.md bagian 9.
 
+(Sudah dikerjakan. Hasil Lighthouse terakhir: HP 96/100/100/100, desktop
+100/100/100/100 untuk performance/accessibility/best-practices/SEO.)
+
 Tugas: uji seluruh situs dan perbaiki yang gagal. Jalankan situsnya dan
 periksa langsung, jangan hanya membaca kode.
 - Lebar layar: 375px, 768px, dan desktop.

@@ -59,13 +59,23 @@ export function Hero() {
               View projects
               <Icon d={ICON.arrowDown} />
             </a>
+            {/* Tombol kedua: unduh CV jika ada, selain itu ajakan menghubungi */}
             <a
-              href={SITE.cvUrl}
-              download
+              href={SITE.cvUrl || "#contact"}
+              download={SITE.cvUrl ? true : undefined}
               className={`inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 font-medium text-fg transition-colors hover:bg-white/10 ${PANEL} ${FOCUS}`}
             >
-              <Icon d={ICON.download} />
-              Download CV
+              {SITE.cvUrl ? (
+                <>
+                  <Icon d={ICON.download} />
+                  Download CV
+                </>
+              ) : (
+                <>
+                  Get in touch
+                  <Icon d={ICON.arrowUpRight} />
+                </>
+              )}
             </a>
           </div>
         </Reveal>

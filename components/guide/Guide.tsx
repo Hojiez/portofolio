@@ -390,7 +390,13 @@ export function Guide() {
         aria-label="Mochi, the site's guide. Click to say hi."
         className={`block rounded-full ${FOCUS}`}
       >
-        <Mascot expression={expression} look={look} size={docked ? DOCK_SIZE : SIZE} />
+        {/* Mochi (dan shader WebGL-nya) baru dibuat saat pertama kali muncul,
+            supaya tidak membebani saat halaman dibuka */}
+        {visible ? (
+          <Mascot expression={expression} look={look} size={docked ? DOCK_SIZE : SIZE} />
+        ) : (
+          <span className="block" style={{ width: docked ? DOCK_SIZE : SIZE, height: docked ? DOCK_SIZE : SIZE }} />
+        )}
       </button>
     </div>
   );

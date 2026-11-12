@@ -88,21 +88,17 @@ body {
 }
 
 /* Cadangan shader: cakram logam dari CSS (components/ui/MetalShader.tsx) */
+/* Bola krom: kilau utama kiri atas, pantulan langit-tanah berupa pita
+   horizontal, dan bayangan di tepi supaya terlihat membulat (bukan kerucut). */
 .metal-disc {
   background:
-    radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.85), transparent 32%),
-    conic-gradient(
-      from 210deg,
-      #5d636c,
-      #e9ecf0,
-      #7b818a,
-      #cfd3d9,
-      #4f545c,
-      #f2f4f7,
-      #5d636c
-    );
+    radial-gradient(circle at 34% 26%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 24%),
+    radial-gradient(ellipse 70% 40% at 62% 78%, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 70%),
+    linear-gradient(172deg, #f2f4f7 0%, #c9ced5 34%, #5d636c 50%, #2a2d33 58%, #8d939c 78%, #d9dde3 100%);
   box-shadow:
-    inset 0 0 40px rgba(0, 0, 0, 0.55),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+    inset -14px -18px 40px rgba(0, 0, 0, 0.55),
+    inset 10px 12px 30px rgba(255, 255, 255, 0.25),
     0 30px 80px -30px rgba(0, 0, 0, 0.9);
 }
 
