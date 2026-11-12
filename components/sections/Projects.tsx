@@ -35,6 +35,22 @@ function ProjectCard({ p, index, featured }: { p: Project; index: number; featur
   return (
     <TiltCard className="h-full">
       <article data-mochi-curious className={`flex h-full flex-col ${featured ? "p-8 sm:p-10" : "p-6"}`}>
+        {p.media && (
+          // animasi demo; pengunjung dengan prefers-reduced-motion melihat poster diam
+          <picture className="mb-5 block overflow-hidden rounded-xl border border-line bg-ink">
+            <source srcSet={p.media.poster} media="(prefers-reduced-motion: reduce)" />
+            {/* <img> biasa, bukan next/image: animasi WebP harus dikirim apa adanya */}
+            <img
+              src={p.media.src}
+              alt={p.media.alt}
+              width={800}
+              height={500}
+              loading="lazy"
+              decoding="async"
+              className="block aspect-[8/5] h-auto w-full object-cover"
+            />
+          </picture>
+        )}
         <div className="flex items-start justify-between gap-4">
           <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-wider text-muted">
             {p.category}

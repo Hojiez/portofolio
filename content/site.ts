@@ -73,6 +73,9 @@ export type Project = {
   tech: string[];
   liveUrl?: string; // opsional — hapus kalau tidak ada demo
   repoUrl?: string; // opsional — hapus kalau repo privat
+  // opsional — animasi demo (WebP berulang) di public/projects/, ditambah
+  // poster diam untuk pengunjung yang mematikan animasi. Ukuran 800×500.
+  media?: { src: string; poster: string; alt: string };
 };
 
 // >>> GANTI DENGAN DATA KAMU: daftar project
@@ -116,7 +119,13 @@ export const PROJECTS: Project[] = [
       "Coursework for a mobile development class: a React Native app with Expo Router and tab navigation.",
     category: "Mobile",
     tech: ["React Native", "Expo", "TypeScript"],
+    liveUrl: "https://tugas-expo.vercel.app",
     repoUrl: "https://github.com/Hojiez/tugas-expo",
+    media: {
+      src: "/projects/expo.webp",
+      poster: "/projects/expo-poster.webp",
+      alt: "The Expo app on a phone screen, switching between the Home, About and Simple tabs",
+    },
   },
   {
     title: "Fish Watcher",
@@ -134,6 +143,11 @@ export const PROJECTS: Project[] = [
     tech: ["HTML", "Tailwind CSS", "JavaScript"],
     liveUrl: "https://hojiez.github.io/porto/",
     repoUrl: "https://github.com/Hojiez/porto",
+    media: {
+      src: "/projects/old-portfolio.webp",
+      poster: "/projects/old-portfolio-poster.webp",
+      alt: "Scrolling through the old portfolio: profile card, tech stack and project list on a dark particle background",
+    },
   },
 ];
 
