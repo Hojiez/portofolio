@@ -13,8 +13,8 @@ export function Footer() {
   const year = useSyncExternalStore(noopSubscribe, getYear, getServerYear);
 
   return (
-    <footer className="relative z-10 border-t border-white/10">
-      <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-2 px-6 py-8 font-[family-name:var(--font-mono)] text-xs text-slate-500 sm:flex-row">
+    <footer className="relative z-10 border-t border-line">
+      <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-2 px-6 py-8 font-[family-name:var(--font-mono)] text-xs text-muted sm:flex-row">
         <p>
           © {year} {SITE.name}
         </p>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { SITE } from "@/content/site";
-import { GLASS } from "./styles";
+import { PANEL } from "./styles";
 
 /* Foto profil dengan fallback inisial */
 export function Portrait() {
@@ -16,7 +16,7 @@ export function Portrait() {
 
   return (
     <div
-      className={`relative mx-auto aspect-square w-full max-w-[280px] overflow-hidden rounded-3xl ${GLASS}`}
+      className={`relative mx-auto aspect-square w-full max-w-[280px] overflow-hidden rounded-3xl ${PANEL}`}
     >
       {SITE.photo && !failed ? (
         // eslint-disable-next-line @next/next/no-img-element
@@ -27,8 +27,8 @@ export function Portrait() {
           className="h-full w-full object-cover"
         />
       ) : (
-        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#2d7bff]/30 to-transparent text-6xl font-semibold text-white/80">
-          {initials}
+        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-white/10 to-transparent">
+          <span className="metal-text text-6xl font-semibold">{initials}</span>
         </div>
       )}
     </div>

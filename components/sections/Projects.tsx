@@ -6,7 +6,7 @@ import { Icon, ICON } from "@/components/ui/Icon";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { TiltCard } from "@/components/ui/TiltCard";
-import { FOCUS, GLASS } from "@/components/ui/styles";
+import { FOCUS, METAL_BUTTON, PANEL } from "@/components/ui/styles";
 
 export function Projects() {
   const [filter, setFilter] = useState<Category>("All");
@@ -35,8 +35,8 @@ export function Projects() {
                 aria-pressed={active}
                 className={`shrink-0 rounded-full px-4 py-2 font-[family-name:var(--font-mono)] text-xs transition-colors ${FOCUS} ${
                   active
-                    ? "bg-[#2d7bff] text-white"
-                    : `text-slate-400 hover:text-white ${GLASS}`
+                    ? `font-medium ${METAL_BUTTON}`
+                    : `text-muted hover:text-fg ${PANEL}`
                 }`}
               >
                 {c}
@@ -52,13 +52,13 @@ export function Projects() {
             <Reveal delay={i * 60} className="h-full">
               <TiltCard className="h-full">
                 <article className="flex h-full flex-col p-6">
-                  <p className="font-[family-name:var(--font-mono)] text-xs text-[#4d8dff]">
+                  <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-wider text-muted">
                     {p.category}
                   </p>
-                  <h3 className="mt-3 text-xl font-semibold tracking-tight text-white">
+                  <h3 className="mt-3 text-xl font-semibold tracking-tight text-fg">
                     {p.title}
                   </h3>
-                  <p className="mt-2 flex-1 leading-relaxed text-slate-400">
+                  <p className="mt-2 flex-1 leading-relaxed text-muted">
                     {p.description}
                   </p>
 
@@ -66,7 +66,7 @@ export function Projects() {
                     {p.tech.map((t) => (
                       <li
                         key={t}
-                        className="rounded-md border border-white/10 px-2 py-1 font-[family-name:var(--font-mono)] text-[11px] text-slate-300"
+                        className="rounded-md border border-line px-2 py-1 font-[family-name:var(--font-mono)] text-[11px] text-fg/80"
                       >
                         {t}
                       </li>
@@ -74,13 +74,13 @@ export function Projects() {
                   </ul>
 
                   {(p.liveUrl || p.repoUrl) && (
-                    <div className="mt-6 flex gap-5 border-t border-white/10 pt-4 text-sm">
+                    <div className="mt-6 flex gap-5 border-t border-line pt-4 text-sm">
                       {p.liveUrl && (
                         <a
                           href={p.liveUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className={`inline-flex items-center gap-1 rounded text-white hover:text-[#4d8dff] ${FOCUS}`}
+                          className={`inline-flex items-center gap-1 rounded text-fg hover:text-accent ${FOCUS}`}
                         >
                           Live
                           <Icon d={ICON.arrowUpRight} />
@@ -92,7 +92,7 @@ export function Projects() {
                           href={p.repoUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className={`inline-flex items-center gap-1 rounded text-slate-400 hover:text-white ${FOCUS}`}
+                          className={`inline-flex items-center gap-1 rounded text-muted hover:text-accent ${FOCUS}`}
                         >
                           Code
                           <Icon d={ICON.arrowUpRight} />
@@ -109,7 +109,7 @@ export function Projects() {
       </ul>
 
       {visibleProjects.length === 0 && (
-        <p className={`rounded-2xl p-8 text-center text-slate-400 ${GLASS}`}>
+        <p className={`rounded-2xl p-8 text-center text-muted ${PANEL}`}>
           Belum ada project di kategori ini.
         </p>
       )}

@@ -1,41 +1,113 @@
 @import "tailwindcss";
 
+/* ----------------------------------------------------------------------------
+ *  TOKEN WARNA — gelap metalik (docs/MASTER_PLAN.md bagian 3)
+ *  Ubah nilai di sini, semua komponen ikut berubah.
+ * ------------------------------------------------------------------------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #08090b;               /* latar utama */
+  --surface: #111317;          /* kartu, panel */
+  --line: rgba(255, 255, 255, 0.08); /* garis dan border */
+  --text: #e7e9ec;             /* teks utama */
+  --muted: #8b9099;            /* teks sekunder */
+  --metal-1: #f2f4f7;          /* sisi terang gradien logam */
+  --metal-2: #6d737d;          /* sisi gelap gradien logam */
+  --accent: #8fd8ff;           /* biru es — hanya untuk aksen kecil */
 }
 
+/* Token di atas jadi kelas Tailwind: bg-ink, bg-surface, border-line,
+   text-fg, text-muted, text-accent, from-metal-1, dan seterusnya. */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-ink: var(--bg);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --color-fg: var(--text);
+  --color-muted: var(--muted);
+  --color-metal-1: var(--metal-1);
+  --color-metal-2: var(--metal-2);
+  --color-accent: var(--accent);
   --font-sans: var(--font-inter);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
 }
 
-/* Smooth scroll + animasi orb latar. Kelas .orb-* dipakai di
-   components/layout/Background.tsx. */
-html {
-  scroll-behavior: smooth;
+/* Teks bergradien logam (components/ui/MetalText.tsx dan kelas .metal-text) */
+.metal-text {
+  background-image: linear-gradient(
+    180deg,
+    var(--metal-1) 0%,
+    #d4d8de 38%,
+    #9aa0a9 62%,
+    #c3c8cf 78%,
+    var(--metal-2) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
-@keyframes orb-a { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(6vw,8vh) scale(1.15); } }
-@keyframes orb-b { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-8vw,-6vh) scale(1.1); } }
-@keyframes orb-c { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(4vw,-10vh) scale(0.9); } }
-.orb-a { animation: orb-a 22s ease-in-out infinite; }
-.orb-b { animation: orb-b 28s ease-in-out infinite; }
-.orb-c { animation: orb-c 34s ease-in-out infinite; }
+
+/* Tombol utama: pelat logam terang dengan teks gelap */
+.metal-button {
+  background-image: linear-gradient(180deg, #f4f6f8 0%, #c9ced5 55%, #aeb4bc 100%);
+  color: var(--bg);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+    0 1px 2px rgba(0, 0, 0, 0.5);
+}
+.metal-button:hover {
+  filter: brightness(1.08);
+}
+
+/* Kilau di tepi kartu yang mengikuti kursor (components/ui/TiltCard.tsx).
+   Lapisan ini hanya terlihat sebagai garis 1px di pinggir kartu. */
+.card-edge {
+  padding: 1px;
+  background: radial-gradient(
+    260px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 255, 255, 0.45),
+    transparent 65%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+}
+
+/* Cadangan shader: cakram logam dari CSS (components/ui/MetalShader.tsx) */
+.metal-disc {
+  background:
+    radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.85), transparent 32%),
+    conic-gradient(
+      from 210deg,
+      #5d636c,
+      #e9ecf0,
+      #7b818a,
+      #cfd3d9,
+      #4f545c,
+      #f2f4f7,
+      #5d636c
+    );
+  box-shadow:
+    inset 0 0 40px rgba(0, 0, 0, 0.55),
+    0 30px 80px -30px rgba(0, 0, 0, 0.9);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  .orb-a, .orb-b, .orb-c { animation: none; }
+  html {
+    scroll-behavior: auto;
+  }
 }

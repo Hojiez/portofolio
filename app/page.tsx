@@ -14,7 +14,7 @@ import { Skills } from "@/components/sections/Skills";
 
 export default function Page() {
   return (
-    <div className="relative min-h-screen overflow-x-clip bg-[#07090d] font-[family-name:var(--font-inter)] text-slate-300 antialiased selection:bg-[#2d7bff]/40 selection:text-white">
+    <div className="relative min-h-screen overflow-x-clip bg-ink font-[family-name:var(--font-inter)] text-fg/85 antialiased selection:bg-accent/30 selection:text-fg">
       <Background />
       <Navbar />
 

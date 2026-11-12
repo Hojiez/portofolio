@@ -1,8 +1,9 @@
 import { ABOUT } from "@/content/site";
+import { MetalText } from "@/components/ui/MetalText";
 import { Portrait } from "@/components/ui/Portrait";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { GLASS } from "@/components/ui/styles";
+import { PANEL } from "@/components/ui/styles";
 
 export function About() {
   return (
@@ -16,7 +17,7 @@ export function About() {
 
         <div>
           <Reveal delay={100}>
-            <div className="space-y-5 text-lg leading-relaxed text-slate-300">
+            <div className="space-y-5 text-lg leading-relaxed text-fg/85">
               {ABOUT.bio.map((p, i) => (
                 <p key={i}>{p}</p>
               ))}
@@ -26,11 +27,11 @@ export function About() {
           <dl className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {ABOUT.stats.map((s, i) => (
               <Reveal key={s.label} delay={150 + i * 70}>
-                <div className={`h-full rounded-2xl p-5 ${GLASS}`}>
-                  <dd className="text-3xl font-semibold tracking-tight text-white">
+                <div className={`h-full rounded-2xl p-5 ${PANEL}`}>
+                  <MetalText as="dd" className="text-3xl font-semibold tracking-tight">
                     {s.value}
-                  </dd>
-                  <dt className="mt-1 font-[family-name:var(--font-mono)] text-xs text-slate-400">
+                  </MetalText>
+                  <dt className="mt-1 font-[family-name:var(--font-mono)] text-xs text-muted">
                     {s.label}
                   </dt>
                 </div>

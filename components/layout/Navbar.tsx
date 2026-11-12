@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { NAV, SITE } from "@/content/site";
 import { Icon, ICON } from "@/components/ui/Icon";
-import { FOCUS, GLASS } from "@/components/ui/styles";
+import { FOCUS, METAL_BUTTON, PANEL } from "@/components/ui/styles";
 
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -12,14 +12,14 @@ export function Navbar() {
     <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4">
       <nav
         aria-label="Navigasi utama"
-        className={`mx-auto max-w-5xl rounded-2xl px-4 py-3 sm:px-6 ${GLASS} bg-[#07090d]/60`}
+        className={`mx-auto max-w-5xl rounded-2xl px-4 py-3 sm:px-6 ${PANEL} bg-ink/60`}
       >
         <div className="flex items-center justify-between">
           <a
             href="#top"
-            className={`rounded font-[family-name:var(--font-mono)] text-sm font-medium text-white ${FOCUS}`}
+            className={`rounded font-[family-name:var(--font-mono)] text-sm font-medium text-fg ${FOCUS}`}
           >
-            <span className="text-[#4d8dff]">~/</span>
+            <span className="text-accent">~/</span>
             {SITE.shortName}
           </a>
 
@@ -29,7 +29,7 @@ export function Navbar() {
               <li key={n.href}>
                 <a
                   href={n.href}
-                  className={`rounded text-sm text-slate-400 transition-colors hover:text-white ${FOCUS}`}
+                  className={`rounded text-sm text-muted transition-colors hover:text-fg ${FOCUS}`}
                 >
                   {n.label}
                 </a>
@@ -39,7 +39,7 @@ export function Navbar() {
               <a
                 href={SITE.cvUrl}
                 download
-                className={`inline-flex items-center gap-2 rounded-lg bg-[#2d7bff] px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-[#4d8dff] ${FOCUS}`}
+                className={`inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition ${METAL_BUTTON} ${FOCUS}`}
               >
                 <Icon d={ICON.download} />
                 CV
@@ -54,7 +54,7 @@ export function Navbar() {
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
             aria-label={menuOpen ? "Tutup menu" : "Buka menu"}
-            className={`inline-flex h-10 w-10 items-center justify-center rounded-lg text-white md:hidden ${FOCUS}`}
+            className={`inline-flex h-10 w-10 items-center justify-center rounded-lg text-fg md:hidden ${FOCUS}`}
           >
             <Icon d={menuOpen ? ICON.close : ICON.menu} className="h-5 w-5" />
           </button>
@@ -64,14 +64,14 @@ export function Navbar() {
         {menuOpen && (
           <ul
             id="mobile-menu"
-            className="mt-3 flex flex-col gap-1 border-t border-white/10 pt-3 md:hidden"
+            className="mt-3 flex flex-col gap-1 border-t border-line pt-3 md:hidden"
           >
             {NAV.map((n) => (
               <li key={n.href}>
                 <a
                   href={n.href}
                   onClick={() => setMenuOpen(false)}
-                  className={`block rounded-lg px-3 py-3 text-slate-300 hover:bg-white/5 hover:text-white ${FOCUS}`}
+                  className={`block rounded-lg px-3 py-3 text-fg/85 hover:bg-white/5 hover:text-fg ${FOCUS}`}
                 >
                   {n.label}
                 </a>
@@ -82,7 +82,7 @@ export function Navbar() {
                 href={SITE.cvUrl}
                 download
                 onClick={() => setMenuOpen(false)}
-                className={`mt-1 flex items-center justify-center gap-2 rounded-lg bg-[#2d7bff] px-3 py-3 font-medium text-white ${FOCUS}`}
+                className={`mt-1 flex items-center justify-center gap-2 rounded-lg px-3 py-3 font-medium ${METAL_BUTTON} ${FOCUS}`}
               >
                 <Icon d={ICON.download} />
                 Download CV
