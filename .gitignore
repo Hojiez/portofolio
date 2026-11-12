@@ -44,3 +44,5 @@ next-env.d.ts
 /scripts/voice/.venv/
 /scripts/voice/models/
 /scripts/voice/samples/
+# contoh chord intro (dibuat ulang dengan: scripts/voice/chime.py --samples docs/chime-samples)
+/docs/chime-samples/

@@ -8,6 +8,7 @@ import { Terminal } from "@/components/intro/Terminal";
 import { INTRO_SCRIPT } from "@/components/intro/introState";
 import { Background } from "@/components/layout/Background";
 import { Footer } from "@/components/layout/Footer";
+import { MetalOrb } from "@/components/layout/MetalOrb";
 import { Navbar } from "@/components/layout/Navbar";
 import { About } from "@/components/sections/About";
 import { Contact } from "@/components/sections/Contact";
@@ -31,6 +32,8 @@ export default function Page() {
       >
         <Background />
         <Navbar />
+        {/* bola logam: di hero, lalu jadi scroll bar dan kursor */}
+        <MetalOrb />
         {/* Mochi melayang di atas isi halaman, dari kursi ke kursi */}
         <Guide />
 

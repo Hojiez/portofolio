@@ -71,26 +71,29 @@ const DONE: Progress = {
 /* Satu langkah: jeda (ms), perubahan tampilan, dan efek suara (opsional). */
 type Step = [number, (p: Progress) => Progress, (() => void)?];
 
-/* Urutan langkah beserta jedanya: ketikan dan instalasi ±3,9 detik, lalu
-   Mochi muncul. Sapaannya ±1,6 detik tanpa suara, atau sepanjang file suaranya
-   (±3,7 detik) jika suara aktif. */
+/* Urutan langkah beserta jedanya, dibuat santai supaya terasa seperti orang
+   mengetik: ketikan dan instalasi ±6 detik, lalu Mochi muncul. Sapaannya
+   ±1,6 detik tanpa suara, atau sepanjang file suaranya jika suara aktif. */
 function buildSchedule(): Step[] {
   const steps: Step[] = [];
-  // tunggu kotak logam pembuka bergoyang lalu melebur jadi jendela (lihat .intro-egg)
-  steps.push([1700, (p) => p]);
+  // tunggu kotak logam pembuka melebur jadi jendela (lihat .intro-egg) dan
+  // chord piano pembuka sempat berdengung sebentar
+  steps.push([2300, (p) => p]);
   for (let i = 1; i <= CMD.length; i++) {
-    // spasi tidak berbunyi, supaya ritmenya terdengar seperti mengetik sungguhan
-    const sound = CMD[i - 1] === " " ? undefined : sfxKey;
-    steps.push([45, (p) => ({ ...p, cmd: i }), sound]);
+    // ritme manusia: jeda tiap huruf sedikit acak, lebih lama setelah spasi;
+    // spasi sendiri tidak berbunyi
+    const space = CMD[i - 1] === " ";
+    const wait = space ? 110 : 70 + Math.round(Math.random() * 50);
+    steps.push([CMD[i - 2] === " " ? wait + 80 : wait, (p) => ({ ...p, cmd: i }), space ? undefined : () => sfxKey()]);
   }
-  steps.push([300, (p) => ({ ...p, install: true }), sfxKey]); // tekan Enter
-  steps.push([450, (p) => ({ ...p, answered: true }), sfxKey]); // ketik "y"
+  steps.push([450, (p) => ({ ...p, install: true }), () => sfxKey(true)]); // tekan Enter
+  steps.push([700, (p) => ({ ...p, answered: true }), () => sfxKey()]); // berpikir, lalu ketik "y"
   CHECKS.forEach((_, i) => {
-    steps.push([180, (p) => ({ ...p, checks: i + 1, spinning: true })]);
-    steps.push([180, (p) => ({ ...p, spinning: false }), () => sfxCheck(i)]);
+    steps.push([i === 0 ? 400 : 190, (p) => ({ ...p, checks: i + 1, spinning: true })]);
+    steps.push([280, (p) => ({ ...p, spinning: false }), () => sfxCheck(i)]);
   });
   // Mochi muncul; sapaannya dijadwalkan terpisah (lihat greetingTimes)
-  steps.push([300, (p) => ({ ...p, mochi: true })]);
+  steps.push([500, (p) => ({ ...p, mochi: true })]);
   return steps;
 }
 

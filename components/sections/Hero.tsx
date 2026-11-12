@@ -1,7 +1,6 @@
 import { SITE } from "@/content/site";
 import { GuideSeat } from "@/components/guide/GuideSeat";
 import { Icon, ICON } from "@/components/ui/Icon";
-import { MetalShader } from "@/components/ui/MetalShader";
 import { MetalText } from "@/components/ui/MetalText";
 import { Reveal } from "@/components/ui/Reveal";
 import { FOCUS, METAL_BUTTON, PANEL } from "@/components/ui/styles";
@@ -9,10 +8,14 @@ import { FOCUS, METAL_BUTTON, PANEL } from "@/components/ui/styles";
 export function Hero() {
   return (
     <section className="mx-auto grid min-h-[100svh] max-w-5xl content-center items-center gap-10 px-6 pb-16 pt-32 lg:grid-cols-[1fr_340px]">
-      {/* Shader: di atas teks di HP, di kanan pada layar lebar */}
-      <Reveal className="order-first lg:order-last">
-        <MetalShader className="mx-auto h-40 w-40 sm:h-56 sm:w-56 lg:h-[340px] lg:w-[340px]" />
-      </Reveal>
+      {/* Tempat bola logam saat di hero: di atas teks di HP, di kanan pada
+          layar lebar. Bolanya sendiri (components/layout/MetalOrb.tsx)
+          melayang di atas halaman dan berubah jadi scroll bar saat di-scroll. */}
+      <div
+        data-orb-anchor
+        aria-hidden="true"
+        className="order-first mx-auto h-40 w-40 sm:h-56 sm:w-56 lg:order-last lg:h-[340px] lg:w-[340px]"
+      />
 
       <div>
         {SITE.status && (

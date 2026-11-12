@@ -2,6 +2,7 @@
 
 import { SCRIPT, SEATS } from "@/content/script";
 import { canAnimateShader } from "@/components/ui/useShaderGate";
+import { preloadChime } from "./sfx";
 
 /*
  * Aset yang dimuat selama loading screen intro, supaya setelahnya semua
@@ -17,6 +18,7 @@ const MAX_WAIT = 6000;
 export async function preloadIntroAssets(onProgress: (done: number, total: number) => void) {
   const tasks: Promise<unknown>[] = [
     ...SEATS.map((id) => fetch(SCRIPT[id].voice).then((r) => r.blob())),
+    preloadChime(), // chord piano saat kotak logam menghilang
     document.fonts?.ready ?? Promise.resolve(),
   ];
   if (canAnimateShader()) {

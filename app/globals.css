@@ -195,6 +195,27 @@ body {
   to { opacity: 1; }
 }
 
+/* Bola logam yang menjadi scroll bar dan kursor (components/layout/MetalOrb.tsx).
+   Kursor asli disembunyikan selama bola menjadi kursor, kecuali di kolom
+   ketik. Bola muncul memudar setelah posisinya pertama kali dihitung. */
+.metal-orb {
+  opacity: 0;
+  transform-origin: 50% 50%;
+  will-change: transform;
+  transition: opacity 400ms ease;
+}
+.metal-orb:not(.orb-shown) {
+  opacity: 0 !important;
+}
+html.orb-cursor,
+html.orb-cursor * {
+  cursor: none !important;
+}
+html.orb-cursor input,
+html.orb-cursor textarea {
+  cursor: text !important;
+}
+
 /* Bingkai krom untuk foto di About (components/ui/Portrait.tsx): pita
    gradien logam selebar padding, garis kilau tipis di tepi dalam, dan
    kilau yang menyapu pelan saat disentuh kursor. */

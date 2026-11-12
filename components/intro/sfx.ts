@@ -33,6 +33,44 @@ function audio() {
   return ctx;
 }
 
+/* Chord piano saat kotak logam menghilang (public/sfx/chime.mp3, dibuat oleh
+   scripts/voice/chime.py). File-nya diunduh selama loading screen; dekode ke
+   audio baru dilakukan saat pertama diputar (butuh AudioContext). */
+const CHIME_URL = "/sfx/chime.mp3";
+let chimeData: ArrayBuffer | null = null;
+let chimeBuf: AudioBuffer | null = null;
+
+export async function preloadChime() {
+  if (chimeData || typeof window === "undefined") return;
+  try {
+    chimeData = await (await fetch(CHIME_URL)).arrayBuffer();
+  } catch {
+    // gagal dimuat: intro tetap jalan, hanya tanpa chord
+  }
+}
+
+function playChime(a: Audio, at: number) {
+  const go = (buf: AudioBuffer) => {
+    const src = a.c.createBufferSource();
+    src.buffer = buf;
+    const g = a.c.createGain();
+    g.gain.value = 0.9;
+    src.connect(g).connect(a.out);
+    // jika dekode selesai terlambat, start() dengan waktu lampau = bunyi sekarang
+    src.start(Math.max(at, a.c.currentTime));
+  };
+  if (chimeBuf) return go(chimeBuf);
+  if (!chimeData) return;
+  void a.c.decodeAudioData(chimeData.slice(0)).then((buf) => {
+    chimeBuf = buf;
+    go(buf);
+  }, () => {});
+}
+
+/* Nada-nada tangga F# mayor (sama dengan chord pembuka), supaya bunyi centang
+   dan "siap" di terminal terdengar senada dengan chord-nya. */
+const F_SHARP = [739.99, 830.61, 932.33, 1108.73, 1244.51, 1479.98]; // F#5 G#5 A#5 C#6 D#6 F#6
+
 /** Panggil saat ada interaksi pengunjung supaya browser mengizinkan suara. */
 export function unlockAudio() {
   const c = audio();
@@ -84,7 +122,8 @@ function tone(
 }
 
 /** Bunyi pembuka: dengung rendah yang naik saat kotak logam bergoyang, desis
- *  kilau saat kilaunya menyapu, dan dua denting kecil saat menjadi terminal. */
+ *  kilau saat kilaunya menyapu, lalu chord piano tepat saat kotak menghilang
+ *  dan menjadi terminal (detik 1,6; lihat animasi intro-egg di globals.css). */
 export function sfxBlob() {
   // dipicu langsung oleh klik tombol gerbang: aktifkan audio dulu bila perlu
   onGesture((a) => blob(a));
@@ -112,52 +151,64 @@ function blob(a: Audio) {
   src.connect(bp).connect(g).connect(out);
   src.start(t + 0.6);
   src.stop(t + 2.2);
-  // denting kecil saat logam mencair menjadi terminal
-  tone(c, out, { freq: 1320, start: t + 1.8, dur: 0.35, vol: 0.05 });
-  tone(c, out, { freq: 1980, start: t + 1.93, dur: 0.4, vol: 0.035 });
+  // chord piano saat kotak logam memudar menjadi terminal
+  playChime(a, t + 1.6);
 }
 
-/** Bunyi tuts keyboard: klik derau pendek, nadanya sedikit acak tiap tuts. */
-export function sfxKey() {
+/** Bunyi tuts keyboard: klik lembut dan agak rendah (seperti keyboard laptop),
+ *  supaya tidak menutupi dengung chord yang masih terdengar. Nada dan
+ *  kerasnya sedikit acak tiap tuts. `heavy` = tombol Enter, lebih dalam. */
+export function sfxKey(heavy = false) {
   const a = ready();
   if (!a) return;
   const { c, out } = a;
   const t = c.currentTime;
   const src = c.createBufferSource();
   src.buffer = a.noise;
-  src.playbackRate.value = 0.8 + Math.random() * 0.5;
+  src.playbackRate.value = 0.7 + Math.random() * 0.3;
   const bp = c.createBiquadFilter();
   bp.type = "bandpass";
-  bp.frequency.value = 1800 + Math.random() * 1600;
-  bp.Q.value = 1.2;
+  bp.frequency.value = (heavy ? 900 : 1300) + Math.random() * 700;
+  bp.Q.value = 1.4;
   const g = c.createGain();
+  const vol = (heavy ? 0.26 : 0.16) * (0.8 + Math.random() * 0.4);
   g.gain.setValueAtTime(0.0001, t);
-  g.gain.linearRampToValueAtTime(0.35, t + 0.002);
-  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.035);
+  g.gain.linearRampToValueAtTime(vol, t + 0.003);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + (heavy ? 0.06 : 0.04));
   src.connect(bp).connect(g).connect(out);
   src.start(t);
-  src.stop(t + 0.05);
+  src.stop(t + 0.07);
   // "dok" rendah supaya terasa seperti tuts yang ditekan
-  tone(c, out, { freq: 160 + Math.random() * 40, start: t, dur: 0.03, vol: 0.12, type: "triangle" });
+  tone(c, out, {
+    freq: (heavy ? 110 : 140) + Math.random() * 30,
+    start: t,
+    dur: heavy ? 0.06 : 0.035,
+    vol: heavy ? 0.12 : 0.07,
+    type: "triangle",
+  });
 }
 
-/** Bunyi centang: "tik" bernada tinggi yang naik sedikit. */
+/** Bunyi centang: denting lembut seperti lonceng kecil, naik satu nada
+ *  tangga F# mayor tiap baris. */
 export function sfxCheck(index = 0) {
   const a = ready();
   if (!a) return;
   const { c, out } = a;
-  const base = 880 * Math.pow(2, (index * 2) / 12); // naik satu nada tiap baris
-  tone(c, out, { freq: base, to: base * 1.5, start: c.currentTime, dur: 0.09, vol: 0.12 });
+  const t = c.currentTime;
+  const f = F_SHARP[index % F_SHARP.length];
+  tone(c, out, { freq: f, start: t, dur: 0.5, vol: 0.07 });
+  tone(c, out, { freq: f * 2, start: t, dur: 0.25, vol: 0.02 }); // kilau oktaf atas
 }
 
-/** Bunyi saat baris "press ENTER" muncul: dua nada lembut. */
+/** Bunyi saat baris "press ENTER" muncul: dua nada F# dan C# yang senada
+ *  dengan chord pembuka. */
 export function sfxReady() {
   const a = ready();
   if (!a) return;
   const { c, out } = a;
   const t = c.currentTime;
-  tone(c, out, { freq: 660, start: t, dur: 0.18, vol: 0.12 });
-  tone(c, out, { freq: 990, start: t + 0.09, dur: 0.28, vol: 0.12 });
+  tone(c, out, { freq: 739.99, start: t, dur: 0.5, vol: 0.09 });
+  tone(c, out, { freq: 1108.73, start: t + 0.12, dur: 0.7, vol: 0.08 });
 }
 
 /** Bunyi saat intro ditutup: sapuan nada naik seperti "masuk". */
