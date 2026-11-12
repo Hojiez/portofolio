@@ -107,6 +107,54 @@ body {
 }
 
 /* ----------------------------------------------------------------------------
+ *  INTRO — layar terminal pembuka (components/intro/Terminal.tsx)
+ *  Dikendalikan atribut <html data-intro>: lihat components/intro/introState.ts
+ * ------------------------------------------------------------------------- */
+.intro-overlay {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 600ms ease,
+    visibility 0s linear 600ms;
+}
+.intro-window {
+  transform: scale(0.96) translateY(10px);
+  transition: transform 600ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+html[data-intro="show"] .intro-overlay {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: none;
+}
+html[data-intro="show"] .intro-window {
+  transform: none;
+  transition: none;
+}
+/* Halaman di belakang intro: tetap ada di HTML, tapi tersembunyi, tidak bisa
+   difokus, dan tidak bisa di-scroll sampai intro ditutup. */
+html[data-intro="show"] {
+  overflow: hidden;
+}
+html[data-intro="show"] #page {
+  visibility: hidden;
+}
+.intro-cursor {
+  animation: intro-blink 1s steps(1) infinite;
+}
+.intro-spin {
+  display: inline-block;
+  animation: intro-spin 0.7s linear infinite;
+}
+@keyframes intro-blink {
+  50% { opacity: 0; }
+}
+@keyframes intro-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ----------------------------------------------------------------------------
  *  MOCHI — animasi maskot (components/guide/Mascot.tsx)
  * ------------------------------------------------------------------------- */
 .mochi-face {
@@ -178,6 +226,14 @@ body {
   }
   .mochi-face-3d {
     transition: none;
+  }
+  .intro-cursor,
+  .intro-spin {
+    animation: none;
+  }
+  .intro-overlay,
+  .intro-window {
+    transition-duration: 150ms;
   }
   /* "zzz" tetap terlihat, hanya tidak melayang */
   .mochi-z {

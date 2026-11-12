@@ -23,7 +23,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className="h-full antialiased">
+    // suppressHydrationWarning: skrip intro (app/page.tsx) memasang atribut
+    // data-intro di <html> sebelum React berjalan.
+    <html lang="en" className="h-full antialiased" suppressHydrationWarning>
       {/* Variabel font dipasang di <body>, bukan <html>, supaya tidak bentrok
           dengan variabel tema Tailwind yang ditulis di :root. */}
       <body className={`${inter.variable} ${mono.variable} min-h-full flex flex-col`}>
