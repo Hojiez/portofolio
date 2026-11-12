@@ -143,6 +143,9 @@ memunculkan kalimat section tempat berhenti.
 ```
 Baca docs/MASTER_PLAN.md bagian 7.
 
+(Sudah dikerjakan dengan Kokoro-82M, suara af_heart. Ringkasannya di
+docs/MASTER_PLAN.md bagian 7.)
+
 Langkah 1 (diskusi dulu, jangan menulis kode): bandingkan pilihan
 text-to-speech yang gratis untuk membuat enam file audio pendek berbahasa
 Inggris, dengan karakter suara ceria, hangat, dan bernada sedang. Sertakan

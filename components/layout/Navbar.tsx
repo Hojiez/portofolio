@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { NAV, SITE } from "@/content/site";
+import { SoundToggle } from "@/components/guide/SoundToggle";
 import { Icon, ICON } from "@/components/ui/Icon";
 import { FOCUS, METAL_BUTTON, PANEL } from "@/components/ui/styles";
 
@@ -35,6 +36,9 @@ export function Navbar() {
                 </a>
               </li>
             ))}
+            <li className="-mx-4">
+              <SoundToggle />
+            </li>
             <li>
               <a
                 href={SITE.cvUrl}
@@ -47,7 +51,9 @@ export function Navbar() {
             </li>
           </ul>
 
-          {/* tombol menu HP */}
+          {/* tombol suara + menu HP */}
+          <div className="flex items-center md:hidden">
+          <SoundToggle />
           <button
             type="button"
             onClick={() => setMenuOpen((v) => !v)}
@@ -58,6 +64,7 @@ export function Navbar() {
           >
             <Icon d={menuOpen ? ICON.close : ICON.menu} className="h-5 w-5" />
           </button>
+          </div>
         </div>
 
         {/* menu HP */}

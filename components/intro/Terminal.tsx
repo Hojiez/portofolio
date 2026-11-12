@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { PROJECTS, SITE } from "@/content/site";
-import { wordsOf } from "@/content/script";
+import { SCRIPT, wordsOf } from "@/content/script";
+import { playVoice, stopVoice, wordTimings } from "@/components/guide/useVoice";
 import { setLine } from "@/components/guide/guideStore";
 import { Mascot } from "@/components/guide/Mascot";
 import { setSoundOn, useSoundOn } from "@/components/guide/soundPref";
@@ -67,8 +68,9 @@ const DONE: Progress = {
 /* Satu langkah: jeda (ms), perubahan tampilan, dan efek suara (opsional). */
 type Step = [number, (p: Progress) => Progress, (() => void)?];
 
-/* Urutan langkah beserta jedanya. Total sekitar 5,5 detik: ketikan dan
-   instalasi ±3,9 detik, lalu Mochi muncul dan menyapa ±1,6 detik. */
+/* Urutan langkah beserta jedanya: ketikan dan instalasi ±3,9 detik, lalu
+   Mochi muncul. Sapaannya ±1,6 detik tanpa suara, atau sepanjang file suaranya
+   (±3,7 detik) jika suara aktif. */
 function buildSchedule(): Step[] {
   const steps: Step[] = [];
   steps.push([400, (p) => p]);
@@ -83,14 +85,20 @@ function buildSchedule(): Step[] {
     steps.push([180, (p) => ({ ...p, checks: i + 1, spinning: true })]);
     steps.push([180, (p) => ({ ...p, spinning: false }), () => sfxCheck(i)]);
   });
-  // Mochi muncul lalu menyapa kata demi kata
+  // Mochi muncul; sapaannya dijadwalkan terpisah (lihat greetingTimes)
   steps.push([300, (p) => ({ ...p, mochi: true })]);
-  INTRO_WORDS.forEach((w, i) => {
-    const prev = INTRO_WORDS[i - 1] ?? "";
-    steps.push([i === 0 ? 350 : /[.,!?]$/.test(prev) ? 260 : 90, (p) => ({ ...p, words: i + 1 })]);
-  });
-  steps.push([250, (p) => ({ ...p, ready: true }), sfxReady]);
   return steps;
+}
+
+/* Waktu muncul tiap kata sapaan Mochi (ms sejak mulai). Jika suaranya
+   diputar, mengikuti durasi audio; jika tidak, kecepatan teks biasa. */
+function greetingTimes(duration: number | null) {
+  if (duration) return wordTimings(INTRO_WORDS, duration);
+  let t = 350;
+  return INTRO_WORDS.map((_, i) => {
+    if (i > 0) t += /[.,!?]$/.test(INTRO_WORDS[i - 1]) ? 260 : 90;
+    return t;
+  });
 }
 
 const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -110,6 +118,7 @@ export function Terminal() {
 
   const close = useCallback(() => {
     if (document.documentElement.getAttribute("data-intro") !== "show") return;
+    stopVoice(); // sapaan Mochi berhenti jika intro ditutup di tengah kalimat
     sfxEnter();
     // sapaan intro dihitung sudah diucapkan (satu kalimat per kursi)
     setLine("intro", { shown: INTRO_WORDS.length, done: true });
@@ -143,18 +152,39 @@ export function Terminal() {
 
     const steps = buildSchedule();
     let i = 0;
-    let timer: number;
+    let cancelled = false;
+    const pending: number[] = [];
+    const later = (fn: () => void, ms: number) => pending.push(window.setTimeout(fn, ms));
+
+    // Sapaan Mochi: putar suaranya (jika suara aktif dan diizinkan browser),
+    // munculkan kata-katanya mengikuti suara, lalu baris "press ENTER".
+    const greet = () => {
+      void playVoice(SCRIPT.intro.voice).then((duration) => {
+        if (cancelled) return;
+        const times = greetingTimes(duration);
+        times.forEach((t, w) => later(() => setP((q) => ({ ...q, words: w + 1 })), t));
+        const end = duration ? duration * 1000 : times[times.length - 1];
+        later(() => {
+          sfxReady();
+          setP((q) => ({ ...q, ready: true }));
+        }, end + 250);
+      });
+    };
+
     const run = () => {
-      if (i >= steps.length) return;
+      if (i >= steps.length) return greet();
       const [wait, apply, sound] = steps[i++];
-      timer = window.setTimeout(() => {
+      later(() => {
         sound?.();
         setP(apply);
         run();
       }, wait);
     };
     run();
-    return () => window.clearTimeout(timer);
+    return () => {
+      cancelled = true;
+      pending.forEach((t) => window.clearTimeout(t));
+    };
   }, []);
 
   // Interaksi pertama pengunjung (klik, tap, tombol) membuka izin suara browser.

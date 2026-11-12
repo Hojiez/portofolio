@@ -8,6 +8,7 @@ import { FOCUS } from "@/components/ui/styles";
 import type { MascotExpression } from "./expressions";
 import { getLine, setLine } from "./guideStore";
 import { Mascot, type MascotLook } from "./Mascot";
+import { playVoice, stopVoice, useStopVoiceWhenMuted, wordTimings } from "./useVoice";
 
 /*
  * Guide — Mochi sebagai pemandu (docs/MASTER_PLAN.md bagian 6).
@@ -61,6 +62,8 @@ export function Guide() {
   const mochiRef = useRef<HTMLDivElement>(null);
   const active = useRef<SeatId | null>(null);
   const speaking = useRef(false);
+  const speakToken = useRef(0); // naik setiap ada kalimat baru; membatalkan yang lama
+  useStopVoiceWhenMuted();
   const lastY = useRef(0);
   const timers = useRef<Partial<Record<TimerKey, number>>>({});
 
@@ -99,11 +102,14 @@ export function Guide() {
     [clear]
   );
 
-  /* Ucapkan kalimat kursi kata demi kata (atau diam jika sudah pernah). */
+  /* Ucapkan kalimat kursi kata demi kata (atau diam jika sudah pernah).
+     Jika suara aktif, kata-kata dan gerak mulut mengikuti durasi file
+     suaranya; jika mati atau gagal dimuat, memakai kecepatan teks biasa. */
   const speak = useCallback(
     (id: SeatId) => {
       clear("speak");
       clear("react");
+      const token = ++speakToken.current;
       const words = wordsOf(id);
       const start = getLine(id);
       if (start.done) {
@@ -111,27 +117,43 @@ export function Guide() {
         setLook(undefined);
         return;
       }
-      if (reducedMotion()) {
-        setLine(id, { shown: words.length, done: true });
-        react(id);
-        return;
-      }
       speaking.current = true;
       setExpression("talk");
       setLook(isMobile() ? LOOK_BUBBLE_DOCKED : LOOK_BUBBLE);
-      let shown = start.shown;
-      const step = () => {
-        shown += 1;
-        const done = shown >= words.length;
-        setLine(id, { shown, done });
-        if (done) {
-          react(id);
+
+      void playVoice(SCRIPT[id].voice).then((duration) => {
+        // Mochi sudah pindah kursi selama menunggu file dimuat
+        if (token !== speakToken.current) return;
+        const t0 = performance.now();
+        const left = () => (duration ? Math.max(0, duration * 1000 - (performance.now() - t0)) : 0);
+
+        if (reducedMotion()) {
+          // teks langsung utuh; suara (jika ada) tetap diputar sampai selesai
+          setLine(id, { shown: words.length, done: true });
+          timers.current.speak = window.setTimeout(() => react(id), left());
           return;
         }
-        const word = words[shown - 1];
-        timers.current.speak = window.setTimeout(step, /[.,!?]$/.test(word) ? PAUSE_MS : WORD_MS);
-      };
-      step();
+
+        const times = duration ? wordTimings(words, duration) : null;
+        let shown = start.shown;
+        const step = () => {
+          shown += 1;
+          const done = shown >= words.length;
+          setLine(id, { shown, done });
+          if (done) {
+            // tunggu suaranya selesai sebelum berhenti "bicara"
+            timers.current.speak = window.setTimeout(() => react(id), left());
+            return;
+          }
+          const wait = times
+            ? Math.max(0, times[shown] - (performance.now() - t0))
+            : /[.,!?]$/.test(words[shown - 1])
+              ? PAUSE_MS
+              : WORD_MS;
+          timers.current.speak = window.setTimeout(step, wait);
+        };
+        step();
+      });
     },
     [clear, react]
   );
@@ -144,6 +166,9 @@ export function Guide() {
       clear("arrive");
       clear("speak");
       clear("react");
+      // hentikan suara kalimat lama (hanya satu kalimat berbunyi sekaligus)
+      speakToken.current++;
+      stopVoice();
 
       // kalimat lama yang terpotong langsung ditampilkan utuh
       if (prev) {
@@ -234,6 +259,7 @@ export function Guide() {
       io.disconnect();
       window.removeEventListener(INTRO_DONE_EVENT, onIntroDone);
       Object.values(t).forEach((id) => window.clearTimeout(id));
+      stopVoice();
     };
   }, [activate, clear]);
 

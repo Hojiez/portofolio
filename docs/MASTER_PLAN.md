@@ -170,7 +170,8 @@ Karena naskahnya tetap, suara **dibuat sekali di awal** lalu disimpan sebagai fi
 Rincian:
 
 - Satu file per kalimat di `public/voice/` (misalnya `hero.mp3`), ukuran kecil, dimuat saat dibutuhkan.
-- Pembuatan file dilakukan di luar situs. Karena hanya enam kalimat pendek, jalur gratis realistis: model TTS open-source yang dijalankan di komputer sendiri (misalnya Piper atau Kokoro), atau kuota gratis layanan TTS daring. Pilihan dan syarat lisensinya diputuskan di fase 5.
+- Pembuatan file dilakukan di luar situs. **Diputuskan di Fase 5: Kokoro-82M (lisensi Apache 2.0), suara `af_heart`, kecepatan normal**, dijalankan di komputer sendiri lewat `kokoro-onnx`. Skripnya `scripts/voice/generate.py` membaca teks langsung dari `content/script.ts`; jalankan ulang setiap kali naskah berubah. Nama Rauh, Hessed, dan Mochi diberi ejaan khusus di skrip itu karena dibaca salah oleh TTS. Lingkungan Python dan file model (±340 MB) tidak di-commit.
+- Pemutarnya `components/guide/useVoice.ts`. Suara Mochi hanya berbunyi jika pilihan suara On dan pengunjung sudah berinteraksi; satu kalimat pada satu waktu; jika file gagal dimuat, teks memakai kecepatan biasa. Tombol suara ada di intro dan di navbar.
 - Karakter suara: ceria dan hangat, nada sedang.
 - Suara **mati secara default**. Pengunjung menyalakannya lewat tombol di intro atau di pojok layar. Pilihan disimpan di `localStorage`.
 - Gerak mulut maskot mengikuti durasi audio jika suara aktif, atau mengikuti kecepatan teks jika mati.

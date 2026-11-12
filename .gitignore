@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# pembuat suara Mochi (scripts/voice): lingkungan Python, model, dan contoh suara
+/scripts/voice/.venv/
+/scripts/voice/models/
+/scripts/voice/samples/
