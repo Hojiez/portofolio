@@ -24,7 +24,7 @@ export function Projects() {
       <Reveal>
         <div
           role="group"
-          aria-label="Filter project berdasarkan kategori"
+          aria-label="Filter projects by category"
           className="-mx-6 mb-10 flex gap-2 overflow-x-auto px-6 pb-2 sm:mx-0 sm:flex-wrap sm:px-0"
         >
           {CATEGORIES.map((c) => {
@@ -51,9 +51,9 @@ export function Projects() {
       <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {visibleProjects.map((p, i) => (
           <li key={p.title}>
-            <Reveal delay={i * 60} className="h-full">
+            <Reveal step={i} className="h-full">
               <TiltCard className="h-full">
-                <article className="flex h-full flex-col p-6">
+                <article data-mochi-curious className="flex h-full flex-col p-6">
                   <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-wider text-muted">
                     {p.category}
                   </p>
@@ -112,7 +112,7 @@ export function Projects() {
 
       {visibleProjects.length === 0 && (
         <p className={`rounded-2xl p-8 text-center text-muted ${PANEL}`}>
-          Belum ada project di kategori ini.
+          No projects in this category yet.
         </p>
       )}
     </section>

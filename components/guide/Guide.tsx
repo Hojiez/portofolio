@@ -88,18 +88,33 @@ export function Guide() {
     return y;
   }, []);
 
+  /* Suasana hati di luar kalimat (diatur efek "curious/sleep" di bawah). */
+  const mood = useRef({ curious: false, sleeping: false });
+
+  /* Kembali santai: "curious" jika kursor masih di atas kartu project,
+     "sleep" jika pengunjung sedang diam, selain itu "idle". */
+  const rest = useCallback(() => {
+    if (mood.current.sleeping) {
+      setExpression("sleep");
+      setLook({ x: 0, y: 0.25 });
+    } else if (mood.current.curious) {
+      setExpression("curious");
+      setLook("cursor");
+    } else {
+      setExpression("idle");
+      setLook(undefined); // kembali melirik sendiri
+    }
+  }, []);
+
   /* Ekspresi reaksi sebentar setelah kalimat selesai, lalu kembali santai. */
   const react = useCallback(
     (id: SeatId) => {
       speaking.current = false;
       setExpression(SCRIPT[id].expression);
       clear("react");
-      timers.current.react = window.setTimeout(() => {
-        setExpression("idle");
-        setLook(undefined); // kembali melirik sendiri
-      }, REACT_MS);
+      timers.current.react = window.setTimeout(rest, REACT_MS);
     },
-    [clear]
+    [clear, rest]
   );
 
   /* Ucapkan kalimat kursi kata demi kata (atau diam jika sudah pernah).
@@ -113,8 +128,7 @@ export function Guide() {
       const words = wordsOf(id);
       const start = getLine(id);
       if (start.done) {
-        setExpression("idle");
-        setLook(undefined);
+        rest();
         return;
       }
       speaking.current = true;
@@ -155,7 +169,7 @@ export function Guide() {
         step();
       });
     },
-    [clear, react]
+    [clear, react, rest]
   );
 
   /* Pindahkan Mochi ke kursi baru, lalu bicara setelah sampai. */
@@ -275,6 +289,76 @@ export function Guide() {
     return () => ro.disconnect();
   }, [place]);
 
+  // Suasana hati di luar kalimat:
+  //   - "curious" (dan mengikuti kursor) saat kursor di atas elemen bertanda
+  //     data-mochi-curious, misalnya kartu project;
+  //   - "sleep" setelah pengunjung diam IDLE_MS; bangun dengan senyum saat
+  //     ada gerakan lagi.
+  // Keduanya tidak mengganggu Mochi yang sedang bicara.
+  useEffect(() => {
+    const IDLE_MS = 30000;
+    const m = mood.current;
+    let idleTimer = 0;
+
+    // Ganti ke suasana hati baru sekarang juga (memotong ekspresi reaksi),
+    // kecuali Mochi sedang bicara: nanti dipakai saat kalimatnya selesai.
+    const applyNow = () => {
+      if (speaking.current) return;
+      clear("react");
+      clear("poke");
+      rest();
+    };
+    const arm = () => {
+      window.clearTimeout(idleTimer);
+      idleTimer = window.setTimeout(() => {
+        if (speaking.current) return arm();
+        m.sleeping = true;
+        applyNow();
+      }, IDLE_MS);
+    };
+    const activity = () => {
+      if (m.sleeping) {
+        m.sleeping = false;
+        if (!speaking.current) {
+          // bangun dengan senyum, lalu kembali santai
+          clear("react");
+          setExpression("happy");
+          setLook({ x: 0, y: 0 });
+          clear("poke");
+          timers.current.poke = window.setTimeout(() => {
+            if (!speaking.current) rest();
+          }, 900);
+        }
+      }
+      arm();
+    };
+    const cardOf = (t: EventTarget | null) =>
+      t instanceof Element ? t.closest("[data-mochi-curious]") : null;
+    const over = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse" || m.curious || !cardOf(e.target)) return;
+      m.curious = true;
+      if (!m.sleeping) applyNow();
+    };
+    const out = (e: PointerEvent) => {
+      const from = cardOf(e.target);
+      if (!m.curious || !from || from === cardOf(e.relatedTarget)) return;
+      m.curious = false;
+      if (!m.sleeping) applyNow();
+    };
+
+    const events = ["pointermove", "pointerdown", "keydown", "scroll", "touchstart"] as const;
+    events.forEach((ev) => window.addEventListener(ev, activity, { passive: true }));
+    document.addEventListener("pointerover", over);
+    document.addEventListener("pointerout", out);
+    arm();
+    return () => {
+      window.clearTimeout(idleTimer);
+      events.forEach((ev) => window.removeEventListener(ev, activity));
+      document.removeEventListener("pointerover", over);
+      document.removeEventListener("pointerout", out);
+    };
+  }, [clear, rest]);
+
   // Berpindah antara mode HP (menempel di pojok) dan layar lebar.
   useEffect(() => {
     if (active.current) lastY.current = place(active.current);
@@ -287,7 +371,7 @@ export function Guide() {
     clear("poke");
     setExpression("happy");
     timers.current.poke = window.setTimeout(() => {
-      if (!speaking.current) setExpression("idle");
+      if (!speaking.current) rest();
     }, 1100);
   };
 

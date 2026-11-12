@@ -2,14 +2,24 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
-/* Reveal — elemen muncul halus saat masuk layar */
+/*
+ * Reveal — elemen muncul halus saat masuk layar.
+ *
+ * Semua section memakai aturan yang sama: elemen ke-n dalam satu kelompok
+ * muncul n × STAGGER ms setelah yang pertama (paling lambat MAX_STEP langkah,
+ * supaya daftar panjang tidak terasa lama menunggu).
+ */
+const STAGGER = 80;
+const MAX_STEP = 5;
+
 export function Reveal({
   children,
-  delay = 0,
+  step = 0,
   className = "",
 }: {
   children: ReactNode;
-  delay?: number;
+  /** Urutan elemen dalam kelompoknya (0 = pertama). */
+  step?: number;
   className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -39,11 +49,12 @@ export function Reveal({
   return (
     <div
       ref={ref}
-      style={{ transitionDelay: `${delay}ms` }}
-      className={`transition-all duration-700 ease-out motion-reduce:transition-none ${
+      style={{ transitionDelay: `${Math.min(step, MAX_STEP) * STAGGER}ms` }}
+      className={`transition-[opacity,transform,filter] duration-700 ease-out motion-reduce:transition-none ${
         shown
-          ? "translate-y-0 opacity-100"
-          : "translate-y-6 opacity-0 motion-reduce:translate-y-0 motion-reduce:opacity-100"
+          ? // filter-none (bukan blur-0) supaya efek kaca backdrop-blur di dalamnya tetap bekerja
+            "translate-y-0 opacity-100 filter-none"
+          : "translate-y-6 opacity-0 blur-[2px] motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:filter-none"
       } ${className}`}
     >
       {children}

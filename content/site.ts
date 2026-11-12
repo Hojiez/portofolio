@@ -15,7 +15,7 @@ export const SITE = {
   role: "Full-Stack Developer",
   // >>> GANTI DENGAN DATA KAMU: satu kalimat pembuka di hero
   tagline:
-    "I build fast, clean web products — from smart contracts and AI tooling to the interfaces people actually touch.",
+    "I build practical software — quality-of-life tools, apps that bring local businesses online, and the interfaces people actually touch.",
   // >>> GANTI DENGAN DATA KAMU: teks status kecil di atas nama (kosongkan "" untuk menyembunyikan)
   status: "Open to work",
   // >>> GANTI DENGAN DATA KAMU: lokasi
@@ -27,6 +27,9 @@ export const SITE = {
   // >>> GANTI DENGAN DATA KAMU: path foto — taruh fotonya di folder /public
   //     (kalau file tidak ada, otomatis diganti kotak berisi inisial nama)
   photo: "/profile.jpg",
+  // >>> GANTI DENGAN DATA KAMU: alamat situs setelah online, misalnya
+  //     "https://rauh.vercel.app". Kosongkan "" kalau belum ada.
+  url: "",
 };
 
 // >>> GANTI DENGAN DATA KAMU: link sosial media (hapus / tambah baris sesukamu)
@@ -39,16 +42,20 @@ export const SOCIALS: { label: string; href: string }[] = [
 export const ABOUT = {
   // >>> GANTI DENGAN DATA KAMU: bio — tiap string = satu paragraf
   bio: [
-    "Tulis paragraf pertama bio kamu di sini. Ceritakan siapa kamu, apa yang sedang kamu kerjakan, dan apa yang membuatmu tertarik pada bidang ini.",
-    "Paragraf kedua: pengalaman, cara kerja, atau hal yang ingin kamu pelajari berikutnya. Singkat saja — dua sampai tiga kalimat sudah cukup.",
+    "I'm a Computer Science student at BINUS University Malang. I got into programming through security: I started out making cheats for games, got curious about how game security actually works, and was already writing my own programs in junior high.",
+    "I like building quality-of-life tools, such as external apps that make games easier to play, and projects that help people directly, like bringing traditional shops into the modern era with a proper database behind them. Right now I'm studying operating systems and compilation techniques, and next I want to go deeper into cybersecurity.",
   ],
   // >>> GANTI DENGAN DATA KAMU: angka sorotan (maksimal 4 supaya rapi)
-  stats: [
-    { value: "3+", label: "Years coding" },
-    { value: "12", label: "Projects shipped" },
-    { value: "4", label: "Hackathons" },
-    { value: "∞", label: "Cups of coffee" },
-  ],
+  // (dibuat sebagai getter supaya jumlah project otomatis mengikuti PROJECTS)
+  get stats() {
+    return [
+      { value: "3+", label: "Years coding" },
+      { value: String(PROJECTS.length), label: "Projects shipped" },
+      { value: "C1", label: "English, certified Advanced" },
+      // bahasa pemrograman di project: JavaScript, TypeScript, Go, Java, Python
+      { value: "5", label: "Languages shipped in" },
+    ];
+  },
 };
 
 // Kategori filter project. Boleh diganti, tapi "All" harus tetap ada di depan.
@@ -68,42 +75,42 @@ export type Project = {
 // >>> GANTI DENGAN DATA KAMU: daftar project
 export const PROJECTS: Project[] = [
   {
-    title: "Toko Perabotan (v2)",
+    title: "Furniture Store (v2)",
     description:
-      "Aplikasi web toko perabotan full-stack dengan login JWT, pembayaran via Midtrans, dan fitur AI berbasis Google Gemini.",
+      "Full-stack furniture store web app with JWT login, payments through Midtrans, and AI features powered by Google Gemini.",
     category: "Web",
     tech: ["Node.js", "Express", "PostgreSQL", "JWT", "Midtrans", "Gemini API"],
     liveUrl: "https://app-database-new.vercel.app",
     repoUrl: "https://github.com/Hojiez/app-database-new",
   },
   {
-    title: "Toko Perabotan (Go)",
+    title: "Furniture Store (Go)",
     description:
-      "Versi backend aplikasi toko perabotan yang ditulis ulang dengan Go dan framework Gin, terhubung ke database MySQL.",
+      "The furniture store backend rewritten in Go with the Gin framework, connected to a MySQL database.",
     category: "Backend",
     tech: ["Go", "Gin", "MySQL", "HTML"],
     repoUrl: "https://github.com/Hojiez/app_database_perabotan_golang",
   },
   {
-    title: "Toko Perabotan",
+    title: "Furniture Store",
     description:
-      "Aplikasi CRUD database toko perabotan dengan REST API Express dan PostgreSQL, plus antarmuka web sederhana.",
+      "CRUD database app for a furniture store, with an Express and PostgreSQL REST API and a simple web interface.",
     category: "Backend",
     tech: ["Node.js", "Express", "PostgreSQL", "HTML"],
     repoUrl: "https://github.com/Hojiez/app_database_perabotan",
   },
   {
-    title: "Rehab Stroke",
+    title: "Stroke Rehab",
     description:
-      "Aplikasi web untuk pengelolaan data rehabilitasi pasien stroke, dibangun dengan Spring Boot, Thymeleaf, dan MySQL.",
+      "Web app for managing stroke patients' rehabilitation records, built with Spring Boot, Thymeleaf, and MySQL.",
     category: "Web",
     tech: ["Java", "Spring Boot", "Thymeleaf", "MySQL"],
     repoUrl: "https://github.com/Hojiez/rehab",
   },
   {
-    title: "Tugas Expo",
+    title: "Expo Assignment",
     description:
-      "Aplikasi mobile React Native dengan Expo Router dan navigasi tab, dibuat sebagai tugas pengembangan aplikasi mobile.",
+      "React Native mobile app with Expo Router and tab navigation, built for a mobile app development course.",
     category: "Mobile",
     tech: ["React Native", "Expo", "TypeScript"],
     repoUrl: "https://github.com/Hojiez/tugas-expo",
@@ -111,15 +118,15 @@ export const PROJECTS: Project[] = [
   {
     title: "Fish Watcher",
     description:
-      "Aplikasi desktop yang memantau pesan Discord dan otomatis bergabung ke server Roblox, dengan GUI dan notifikasi desktop.",
+      "Desktop app that watches Discord messages and automatically joins Roblox servers, with a GUI and desktop notifications.",
     category: "Tools",
     tech: ["Python", "Playwright", "CustomTkinter"],
     repoUrl: "https://github.com/Hojiez/fish-watcher",
   },
   {
-    title: "rauh. — Portfolio Lama",
+    title: "rauh. — Old Portfolio",
     description:
-      "Portfolio single-page bergaya dark minimalist dengan glassmorphism, background partikel, dan pemutar musik acak.",
+      "Dark, minimalist single-page portfolio with glassmorphism, a particle background, and a shuffle music player.",
     category: "Web",
     tech: ["HTML", "Tailwind CSS", "JavaScript"],
     liveUrl: "https://hojiez.github.io/porto/",
@@ -129,21 +136,22 @@ export const PROJECTS: Project[] = [
 
 // >>> GANTI DENGAN DATA KAMU: tech stack, dikelompokkan
 export const SKILLS: { group: string; items: string[] }[] = [
+  // (semua skill di bawah dipakai di project yang dipajang di atas)
   {
-    group: "Frontend",
-    items: ["TypeScript", "React", "Next.js", "Tailwind CSS", "HTML/CSS"],
+    group: "Languages",
+    items: ["TypeScript", "JavaScript", "Python", "Go", "Java"],
   },
   {
-    group: "Backend",
-    items: ["Node.js", "Express", "Python", "PostgreSQL", "REST API"],
+    group: "Web & Mobile",
+    items: ["React", "Next.js", "React Native (Expo)", "Tailwind CSS", "HTML/CSS"],
   },
   {
-    group: "AI & Data",
-    items: ["PyTorch", "scikit-learn", "Pandas", "LLM APIs"],
+    group: "Backend & Data",
+    items: ["Node.js", "Express", "Gin", "Spring Boot", "PostgreSQL", "MySQL", "REST API"],
   },
   {
     group: "Tools",
-    items: ["Git", "Docker", "Figma", "Vercel", "Linux"],
+    items: ["Git", "Vercel", "Playwright", "Gemini API"],
   },
 ];
 

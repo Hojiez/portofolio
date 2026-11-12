@@ -12,7 +12,7 @@ export function Skills() {
 
       <div className="grid gap-5 sm:grid-cols-2">
         {SKILLS.map((g, i) => (
-          <Reveal key={g.group} delay={i * 70} className="h-full">
+          <Reveal key={g.group} step={i} className="h-full">
             <div className={`h-full rounded-2xl p-6 ${PANEL}`}>
               <h3 className="font-[family-name:var(--font-mono)] text-sm text-muted">
                 {g.group}

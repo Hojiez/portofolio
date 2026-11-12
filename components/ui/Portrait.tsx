@@ -22,7 +22,7 @@ export function Portrait() {
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={SITE.photo}
-          alt={`Foto ${SITE.name}`}
+          alt={`Photo of ${SITE.name}`}
           onError={() => setFailed(true)}
           className="h-full w-full object-cover"
         />

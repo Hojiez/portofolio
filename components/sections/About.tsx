@@ -18,7 +18,7 @@ export function About() {
         </Reveal>
 
         <div>
-          <Reveal delay={100}>
+          <Reveal step={1}>
             <div className="space-y-5 text-lg leading-relaxed text-fg/85">
               {ABOUT.bio.map((p, i) => (
                 <p key={i}>{p}</p>
@@ -28,7 +28,7 @@ export function About() {
 
           <dl className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {ABOUT.stats.map((s, i) => (
-              <Reveal key={s.label} delay={150 + i * 70}>
+              <Reveal key={s.label} step={2 + i}>
                 <div className={`h-full rounded-2xl p-5 ${PANEL}`}>
                   <MetalText as="dd" className="text-3xl font-semibold tracking-tight">
                     {s.value}

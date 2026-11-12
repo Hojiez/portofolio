@@ -29,7 +29,7 @@ export function Hero() {
           </Reveal>
         )}
 
-        <Reveal delay={80}>
+        <Reveal step={1}>
           <MetalText
             as="h1"
             className="text-balance pb-2 text-5xl font-semibold leading-[1.05] tracking-tight sm:text-7xl md:text-8xl"
@@ -38,19 +38,19 @@ export function Hero() {
           </MetalText>
         </Reveal>
 
-        <Reveal delay={160}>
+        <Reveal step={2}>
           <p className="mt-5 font-[family-name:var(--font-mono)] text-base text-muted sm:text-lg">
             {SITE.role}
           </p>
         </Reveal>
 
-        <Reveal delay={240}>
+        <Reveal step={3}>
           <p className="mt-6 max-w-xl text-pretty text-lg leading-relaxed text-muted sm:text-xl">
             {SITE.tagline}
           </p>
         </Reveal>
 
-        <Reveal delay={320}>
+        <Reveal step={4}>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <a
               href="#projects"

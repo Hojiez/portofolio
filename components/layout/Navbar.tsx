@@ -12,7 +12,7 @@ export function Navbar() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4">
       <nav
-        aria-label="Navigasi utama"
+        aria-label="Main navigation"
         className={`mx-auto max-w-5xl rounded-2xl px-4 py-3 sm:px-6 ${PANEL} bg-ink/60`}
       >
         <div className="flex items-center justify-between">
@@ -59,7 +59,7 @@ export function Navbar() {
             onClick={() => setMenuOpen((v) => !v)}
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
-            aria-label={menuOpen ? "Tutup menu" : "Buka menu"}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
             className={`inline-flex h-10 w-10 items-center justify-center rounded-lg text-fg md:hidden ${FOCUS}`}
           >
             <Icon d={menuOpen ? ICON.close : ICON.menu} className="h-5 w-5" />
