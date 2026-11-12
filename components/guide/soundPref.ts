@@ -8,6 +8,12 @@ import { useSyncExternalStore } from "react";
  * terminal (sfx.ts), dan suara Mochi (useVoice.ts).
  */
 
+/**
+ * Volume semua suara di situs (efek suara dan suara Mochi), 0–1.
+ * Sengaja kecil: pengunjung sering membuka browser dengan volume penuh.
+ */
+export const SITE_VOLUME = 0.35;
+
 const KEY = "mochi-sound";
 const EVENT = "mochi-sound-change";
 

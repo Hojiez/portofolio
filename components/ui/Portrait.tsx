@@ -16,7 +16,7 @@ export function Portrait() {
 
   return (
     <div
-      className={`relative mx-auto aspect-square w-full max-w-[280px] overflow-hidden rounded-3xl ${PANEL}`}
+      className={`relative aspect-square w-full max-w-[280px] overflow-hidden rounded-3xl ${PANEL}`}
     >
       {SITE.photo && !failed ? (
         // eslint-disable-next-line @next/next/no-img-element

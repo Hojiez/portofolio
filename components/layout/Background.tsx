@@ -1,7 +1,11 @@
-/* Latar: kilau redup dari atas + vinyet di pinggir. Tanpa warna biru. */
+import { MetalWaves } from "./MetalWaves";
+
+/* Latar: gelombang logam yang meliuk pelan, kilau redup dari atas, dan vinyet
+   di pinggir. Tanpa warna biru. */
 export function Background() {
   return (
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0">
+      <MetalWaves />
       <div
         className="absolute inset-0"
         style={{

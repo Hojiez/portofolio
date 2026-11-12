@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { isSoundOn, subscribeSound } from "./soundPref";
+import { isSoundOn, SITE_VOLUME, subscribeSound } from "./soundPref";
 
 /*
  * Pemutar suara Mochi (docs/MASTER_PLAN.md bagian 7).
@@ -55,6 +55,7 @@ export function playVoice(src: string): Promise<number | null> {
 
   const audio = new Audio(src);
   audio.preload = "auto";
+  audio.volume = SITE_VOLUME;
   current = audio;
 
   return new Promise((resolve) => {

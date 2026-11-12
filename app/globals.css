@@ -56,6 +56,59 @@ body {
   box-decoration-break: clone;
 }
 
+/* Pita skill berjalan (components/sections/Skills.tsx) */
+.marquee-mask {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 32s linear infinite;
+}
+.marquee-reverse {
+  animation-direction: reverse;
+}
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+.marquee-group {
+  display: flex;
+  gap: 0.75rem;
+  padding-right: 0.75rem;
+}
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+    width: auto;
+  }
+  .marquee-group {
+    flex-wrap: wrap;
+  }
+  .marquee-group[aria-hidden="true"],
+  .marquee-group li[aria-hidden="true"] {
+    display: none;
+  }
+  .marquee-mask {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
+
+/* Angka raksasa di belakang judul section (components/ui/SectionHeading.tsx) */
+.section-ghost {
+  font-size: clamp(7rem, 18vw, 13rem);
+  letter-spacing: -0.06em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.07);
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 70%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
 /* Tombol utama: pelat logam terang dengan teks gelap */
 .metal-button {
   background-image: linear-gradient(180deg, #f4f6f8 0%, #c9ced5 55%, #aeb4bc 100%);
@@ -87,6 +140,34 @@ body {
     linear-gradient(#000 0 0);
 }
 
+/* Latar gelombang logam (components/layout/MetalWaves.tsx): transparan dan
+   memudar ke bawah supaya megah tapi tidak mengganggu isi. */
+.metal-waves-mask {
+  opacity: 0.6;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.6) 40%, rgba(0, 0, 0, 0.3) 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.6) 40%, rgba(0, 0, 0, 0.3) 100%);
+}
+/* cadangan diam: pita perak diagonal yang dikaburkan */
+.metal-waves {
+  background:
+    repeating-linear-gradient(
+      112deg,
+      transparent 0px,
+      rgba(150, 158, 168, 0.12) 90px,
+      transparent 180px,
+      transparent 260px
+    ),
+    radial-gradient(ellipse 70% 50% at 20% 10%, rgba(200, 206, 214, 0.1), transparent 70%);
+  filter: blur(24px);
+}
+.metal-waves-canvas {
+  animation: metal-waves-in 2.5s ease both;
+}
+@keyframes metal-waves-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 /* Cadangan shader: cakram logam dari CSS (components/ui/MetalShader.tsx) */
 /* Bola krom: kilau utama kiri atas, pantulan langit-tanah berupa pita
    horizontal, dan bayangan di tepi supaya terlihat membulat (bukan kerucut). */
@@ -114,7 +195,8 @@ body {
     opacity 600ms ease,
     visibility 0s linear 600ms;
 }
-.intro-window {
+.intro-window,
+.intro-egg {
   transform: scale(0.96) translateY(10px);
   transition: transform 600ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -136,6 +218,63 @@ html[data-intro="show"] {
 html[data-intro="show"] #page {
   visibility: hidden;
 }
+/* Pembuka: jendela terminal lahir sebagai blob logam cair yang mengembang dan
+   bergoyang, lalu lapisan logamnya mencair dan memperlihatkan terminal. */
+/* Hanya transform dan opacity yang dianimasikan: keduanya dikerjakan kartu
+   grafis tanpa menggambar ulang halaman. (Versi awal menganimasikan
+   border-radius jendela, dan itu membuat satu tugas 0,9 detik di HP.) */
+html[data-intro="show"] .intro-egg {
+  animation: intro-egg 2.2s cubic-bezier(0.3, 0.9, 0.3, 1) both;
+  will-change: transform, opacity;
+}
+html[data-intro="show"] .intro-window {
+  animation: intro-window-in 2.2s ease both;
+}
+@keyframes intro-egg {
+  0% { transform: scale(0.16, 0.22); opacity: 1; }
+  22% { transform: scale(0.34, 0.42); }
+  40% { transform: scale(0.6, 0.7); }
+  55% { transform: scale(0.88, 0.8); }
+  70% { transform: scale(1.05, 0.97); opacity: 1; }
+  84% { transform: scale(0.99, 1.02); }
+  100% { transform: scale(1); opacity: 0; }
+}
+@keyframes intro-window-in {
+  0%, 62% { opacity: 0; transform: scale(0.97); }
+  100% { opacity: 1; transform: none; }
+}
+.intro-egg {
+  /* tersembunyi di luar animasi pembuka (mis. saat intro ditutup) */
+  opacity: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 26%),
+    radial-gradient(ellipse 60% 35% at 70% 82%, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 70%),
+    radial-gradient(ellipse 40% 25% at 82% 18%, rgba(255, 214, 140, 0.45) 0%, rgba(255, 214, 140, 0) 70%),
+    linear-gradient(165deg, #f2f4f7 0%, #c9ced5 30%, #5d636c 48%, #1f2228 58%, #8d939c 78%, #e3e6ea 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.25),
+    inset 0 -18px 40px rgba(120, 180, 255, 0.18),
+    inset 0 14px 30px rgba(255, 200, 120, 0.12);
+}
+/* kilau yang menyapu permukaan logam (digeser dengan transform) */
+.intro-egg::after {
+  content: "";
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: 0;
+  width: 45%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent);
+  transform: translateX(-120%) skewX(-18deg);
+  animation: intro-sheen 1.4s 0.55s ease-in-out both;
+}
+@keyframes intro-sheen {
+  from { transform: translateX(-120%) skewX(-18deg); }
+  to { transform: translateX(260%) skewX(-18deg); }
+}
+
 /* Mochi "meletup" masuk ke terminal */
 .intro-mochi {
   animation: intro-pop 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -172,11 +311,10 @@ html[data-intro="show"] #page {
   opacity: 1;
   filter: none;
 }
-/* Mochi melayang dari kursi ke kursi (components/guide/Guide.tsx) */
+/* Mochi (components/guide/Guide.tsx). Perpindahan antar kursi berupa lompatan
+   yang dianimasikan dari JavaScript; di sini hanya muncul/hilangnya. */
 .guide-mochi {
-  transition:
-    transform 800ms cubic-bezier(0.45, 0, 0.2, 1),
-    opacity 350ms ease;
+  transition: opacity 350ms ease;
 }
 
 /* ----------------------------------------------------------------------------
@@ -254,8 +392,12 @@ html[data-intro="show"] #page {
   }
   .intro-cursor,
   .intro-spin,
-  .intro-mochi {
+  .intro-mochi,
+  html[data-intro="show"] .intro-window {
     animation: none;
+  }
+  .intro-egg {
+    display: none;
   }
   .intro-overlay,
   .intro-window {

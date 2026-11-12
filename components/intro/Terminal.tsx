@@ -9,7 +9,7 @@ import { Mascot } from "@/components/guide/Mascot";
 import { setSoundOn, useSoundOn } from "@/components/guide/soundPref";
 import { FOCUS } from "@/components/ui/styles";
 import { introShouldShow, markIntroSeen } from "./introState";
-import { sfxCheck, sfxEnter, sfxKey, sfxReady, sfxToggleOn, unlockAudio } from "./sfx";
+import { sfxBlob, sfxCheck, sfxEnter, sfxKey, sfxReady, sfxToggleOn, unlockAudio } from "./sfx";
 
 /*
  * Intro terminal (docs/MASTER_PLAN.md bagian 4).
@@ -73,7 +73,8 @@ type Step = [number, (p: Progress) => Progress, (() => void)?];
    (±3,7 detik) jika suara aktif. */
 function buildSchedule(): Step[] {
   const steps: Step[] = [];
-  steps.push([400, (p) => p]);
+  // tunggu blob logam pembuka mengembang dan melebur jadi jendela (lihat .intro-egg)
+  steps.push([2100, (p) => p]);
   for (let i = 1; i <= CMD.length; i++) {
     // spasi tidak berbunyi, supaya ritmenya terdengar seperti mengetik sungguhan
     const sound = CMD[i - 1] === " " ? undefined : sfxKey;
@@ -149,6 +150,10 @@ export function Terminal() {
       }, 0);
       return () => window.clearTimeout(id);
     }
+
+    // bunyi blob pembuka (hanya terdengar jika suara On dan browser sudah
+    // mengizinkan audio; lihat sfx.ts)
+    sfxBlob();
 
     const steps = buildSchedule();
     let i = 0;
@@ -231,7 +236,11 @@ export function Terminal() {
       />
 
       <div className="relative flex flex-1 items-center justify-center px-4">
-        <div className="intro-window w-full max-w-[640px] overflow-hidden rounded-2xl border border-line bg-surface/90 shadow-[0_40px_120px_-40px_rgba(0,0,0,0.9)]">
+        <div className="relative w-full max-w-[640px]">
+        {/* blob logam cair pembuka: mengembang dari telur kecil lalu melebur
+            menjadi jendela terminal di bawahnya */}
+        <div aria-hidden="true" className="intro-egg pointer-events-none absolute inset-0 z-10" />
+        <div className="intro-window relative w-full overflow-hidden rounded-2xl border border-line bg-surface/90 shadow-[0_40px_120px_-40px_rgba(0,0,0,0.9)]">
           {/* bilah judul jendela */}
           <div className="flex items-center gap-2 border-b border-line px-4 py-3">
             <span aria-hidden="true" className="h-3 w-3 rounded-full bg-white/15" />
@@ -326,6 +335,7 @@ export function Terminal() {
               </p>
             )}
           </div>
+        </div>
         </div>
       </div>
 

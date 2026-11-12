@@ -234,7 +234,18 @@ Fase 3 bisa dikerjakan bersamaan dengan fase 1 dan 2 karena tidak menyentuh file
 
 ## 10. Yang masih perlu diputuskan atau dilengkapi
 
-1. **Alat text-to-speech.** Ditunda sampai fase 5. Karakter suaranya sudah diputuskan (bagian 2).
-2. **Isi yang masih contoh di situs sekarang:** dua paragraf bio di About dan empat angka statistik ("3+ Years coding", "12 Projects shipped", dan seterusnya).
-3. **File yang dirujuk:** `public/cv.pdf` dan `public/profile.jpg` perlu dipastikan ada.
-4. **Skill yang ditampilkan** tidak seluruhnya cocok dengan project yang ada (misalnya PyTorch dan Docker tidak muncul di project mana pun, sedangkan Go dan Java muncul tetapi tidak ada di daftar skill).
+1. ~~Alat text-to-speech~~ — selesai di Fase 5; suara Mochi kemudian diganti ke bahasa "Mochi" (celoteh blip tanpa kata, `MODE = "babble"` di `scripts/voice/generate.py`).
+2. ~~Isi contoh~~ — bio, angka, skill, dan tagline diisi di Fase 6 dari jawaban pemilik.
+3. **File yang dirujuk:** `public/cv.pdf` dan `public/profile.jpg` belum ada. Selama `cvUrl` dan `photo` di `content/site.ts` kosong, tombol CV disembunyikan dan About menampilkan inisial.
+4. ~~Skill tidak cocok dengan project~~ — selesai di Fase 6.
+
+---
+
+## 11. Pembaruan setelah Fase 7
+
+- **Pembuka:** blob telur logam (CSS) mengembang dan melebur menjadi jendela terminal, dengan efek suara dengung + kilau. Hanya `transform` dan `opacity` yang dianimasikan; versi `border-radius` sempat membuat tugas 0,9 detik di HP.
+- **Volume:** semua suara di situs 35% (`SITE_VOLUME` di `components/guide/soundPref.ts`).
+- **Mochi melompat** antar kursi dalam lintasan melengkung (jongkok, melayang, mendarat "penyet"), dengan bunyi mendarat. Di HP, lompatan kecil di pojok.
+- **Latar:** gelombang logam halus dari shader `Warp` (`components/layout/MetalWaves.tsx`), transparan dan memudar ke bawah, menyala setelah intro ditutup. Cadangan CSS untuk tanpa WebGL / reduced motion.
+- **Struktur tidak linear:** angka raksasa bergaris di belakang tiap judul; About editorial asimetris (kalimat pembuka besar + daftar angka bertitik); Projects berupa grid bento dengan kartu unggulan bernomor; Skills berupa pita berjalan per kelompok; Contact berupa "Let's talk." raksasa.
+- **Lighthouse terakhir:** HP 89 / 100 / 100 / 100, desktop 100 / 100 / 100 / 100.

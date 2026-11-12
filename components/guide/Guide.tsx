@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { SCRIPT, wordsOf, type SeatId } from "@/content/script";
 import { INTRO_DONE_EVENT } from "@/components/intro/introState";
-import { sfxBoing } from "@/components/intro/sfx";
+import { sfxBoing, sfxLand } from "@/components/intro/sfx";
 import { FOCUS } from "@/components/ui/styles";
 import type { MascotExpression } from "./expressions";
 import { getLine, setLine } from "./guideStore";
@@ -31,7 +31,7 @@ const SECTION_SEATS: SeatId[] = ["hero", "about", "projects", "skills", "contact
 const SIZE = 88; // ukuran Mochi di layar lebar (sama dengan kotak kursi)
 const DOCK_SIZE = 64; // ukuran Mochi saat menempel di pojok (HP)
 const DWELL = 450; // ms kursi harus berada di tengah layar sebelum aktif
-const TRAVEL = 800; // ms durasi terbang antar kursi (sama dengan .guide-mochi)
+const HOP_MS = 950; // ms durasi lompatan antar kursi
 const WORD_MS = 115; // jeda antar kata
 const PAUSE_MS = 280; // jeda setelah tanda baca
 const REACT_MS = 2400; // lama ekspresi reaksi setelah selesai bicara
@@ -51,7 +51,7 @@ const isMobile = () => window.matchMedia(MOBILE).matches;
 const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const introOpen = () => document.documentElement.getAttribute("data-intro") === "show";
 
-type TimerKey = "dwell" | "arrive" | "speak" | "react" | "poke";
+type TimerKey = "dwell" | "arrive" | "speak" | "react" | "poke" | "land";
 
 export function Guide() {
   const docked = useSyncExternalStore(subscribeMobile, isMobile, () => false);
@@ -64,28 +64,62 @@ export function Guide() {
   const speaking = useRef(false);
   const speakToken = useRef(0); // naik setiap ada kalimat baru; membatalkan yang lama
   useStopVoiceWhenMuted();
-  const lastY = useRef(0);
+  const lastPos = useRef<{ x: number; y: number } | null>(null);
   const timers = useRef<Partial<Record<TimerKey, number>>>({});
 
   const clear = useCallback((key: TimerKey) => window.clearTimeout(timers.current[key]), []);
 
-  /* Taruh Mochi di kotak kursi (layar lebar). Mengembalikan posisi y-nya. */
+  /* Taruh Mochi di kotak kursi (layar lebar), langsung tanpa animasi.
+     Mengembalikan posisinya, atau null di HP (Mochi menempel di pojok). */
   const place = useCallback((id: SeatId) => {
     const el = mochiRef.current;
-    if (!el) return 0;
+    if (!el) return null;
     if (isMobile()) {
       el.style.transform = "";
-      return 0;
+      return null;
     }
     const spot = document.querySelector(`[data-seat-spot="${id}"]`);
     const page = document.getElementById("page");
-    if (!spot || !page) return 0;
+    if (!spot || !page) return null;
     const s = spot.getBoundingClientRect();
     const p = page.getBoundingClientRect();
-    const x = s.left - p.left + (s.width - SIZE) / 2;
-    const y = s.top - p.top + (s.height - SIZE) / 2;
-    el.style.transform = `translate(${x}px, ${y}px)`;
-    return y;
+    const pos = { x: s.left - p.left + (s.width - SIZE) / 2, y: s.top - p.top + (s.height - SIZE) / 2 };
+    el.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
+    return pos;
+  }, []);
+
+  /* Lompatan dari satu kursi ke kursi lain: jongkok, melayang melengkung
+     sambil memanjang, lalu mendarat "penyet" seperti jeli. */
+  const hop = useCallback((from: { x: number; y: number }, to: { x: number; y: number }) => {
+    const el = mochiRef.current;
+    if (!el) return;
+    const peak = Math.min(from.y, to.y) - Math.min(220, 90 + Math.abs(to.y - from.y) * 0.06);
+    const at = (x: number, y: number, sx = 1, sy = 1) => `translate(${x}px, ${y}px) scale(${sx}, ${sy})`;
+    el.animate(
+      [
+        { offset: 0, transform: at(from.x, from.y) },
+        { offset: 0.14, transform: at(from.x, from.y + 6, 1.14, 0.84), easing: "cubic-bezier(0.3, 0, 0.6, 1)" },
+        { offset: 0.5, transform: at((from.x + to.x) / 2, peak, 0.9, 1.14), easing: "cubic-bezier(0.4, 0, 0.7, 0.4)" },
+        { offset: 0.86, transform: at(to.x, to.y, 1.2, 0.8), easing: "ease-out" },
+        { offset: 1, transform: at(to.x, to.y) },
+      ],
+      { duration: HOP_MS }
+    );
+    timers.current.land = window.setTimeout(sfxLand, HOP_MS * 0.86);
+  }, []);
+
+  /* Di HP: lompatan kecil di pojok setiap pindah section. */
+  const hopInPlace = useCallback(() => {
+    mochiRef.current?.animate(
+      [
+        { transform: "translateY(0) scale(1, 1)" },
+        { transform: "translateY(2px) scale(1.12, 0.86)", offset: 0.15 },
+        { transform: "translateY(-26px) scale(0.92, 1.1)", offset: 0.5 },
+        { transform: "translateY(0) scale(1.15, 0.85)", offset: 0.85 },
+        { transform: "translateY(0) scale(1, 1)" },
+      ],
+      { duration: 600, easing: "ease-in-out" }
+    );
   }, []);
 
   /* Suasana hati di luar kalimat (diatur efek "curious/sleep" di bawah). */
@@ -192,27 +226,25 @@ export function Guide() {
       speaking.current = false;
       active.current = id;
 
-      // kemunculan pertama: langsung di kursi tanpa terbang
-      const el = mochiRef.current;
+      // kemunculan pertama langsung di kursi; selanjutnya melompat
       const first = prev === null;
-      if (first && el) el.style.transition = "none";
-      const oldY = lastY.current;
-      const newY = place(id);
-      lastY.current = newY;
-      if (first && el) {
-        void el.offsetWidth; // paksa posisi diterapkan sebelum transisi dinyalakan lagi
-        el.style.transition = "";
-      }
+      const from = lastPos.current;
+      const to = place(id);
+      lastPos.current = to;
       setVisible(true);
 
-      const flies = !first && !isMobile() && !reducedMotion();
-      if (flies) {
+      const jumps = !first && !reducedMotion();
+      if (jumps && from && to) {
         setExpression("idle");
-        setLook({ x: 0, y: newY > oldY ? 0.8 : -0.8 }); // menoleh ke arah terbang
+        setLook({ x: 0, y: to.y > from.y ? 0.8 : -0.8 }); // menoleh ke arah lompatan
+        hop(from, to);
+      } else if (jumps && isMobile()) {
+        hopInPlace();
       }
-      timers.current.arrive = window.setTimeout(() => speak(id), flies ? TRAVEL : first ? 450 : 150);
+      const wait = jumps && from && to ? HOP_MS : first ? 450 : jumps ? 400 : 150;
+      timers.current.arrive = window.setTimeout(() => speak(id), wait);
     },
-    [clear, place, speak]
+    [clear, place, speak, hop, hopInPlace]
   );
 
   // Pantau kursi mana yang sedang berada di tengah layar.
@@ -283,7 +315,7 @@ export function Guide() {
     const page = document.getElementById("page");
     if (!page) return;
     const ro = new ResizeObserver(() => {
-      if (active.current) lastY.current = place(active.current);
+      if (active.current) lastPos.current = place(active.current);
     });
     ro.observe(page);
     return () => ro.disconnect();
@@ -361,7 +393,7 @@ export function Guide() {
 
   // Berpindah antara mode HP (menempel di pojok) dan layar lebar.
   useEffect(() => {
-    if (active.current) lastY.current = place(active.current);
+    if (active.current) lastPos.current = place(active.current);
   }, [docked, place]);
 
   /* Diklik: memantul dan tersenyum (bunyi "boing" jika suara aktif). */

@@ -41,6 +41,8 @@ export const SOCIALS: { label: string; href: string }[] = [
 ];
 
 export const ABOUT = {
+  // >>> GANTI DENGAN DATA KAMU: kalimat pembuka besar di About (ringkasan bio)
+  headline: "I got into code by poking at game security. Now I build things that make life a little easier.",
   // >>> GANTI DENGAN DATA KAMU: bio — tiap string = satu paragraf
   bio: [
     "I'm a Computer Science student at BINUS University Malang. I got into programming through security: I started out making cheats for games, got curious about how game security actually works, and was already writing my own programs in junior high.",

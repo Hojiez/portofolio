@@ -10,7 +10,7 @@
  *     langsung terdengar.
  */
 
-import { isSoundOn } from "@/components/guide/soundPref";
+import { isSoundOn, SITE_VOLUME } from "@/components/guide/soundPref";
 
 let ctx: AudioContext | null = null;
 let master: GainNode | null = null;
@@ -23,7 +23,7 @@ function audio() {
     if (!AC) return null;
     ctx = new AC();
     master = ctx.createGain();
-    master.gain.value = 0.5;
+    master.gain.value = SITE_VOLUME;
     master.connect(ctx.destination);
     // potongan derau putih pendek, dipakai untuk bunyi tuts
     noise = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.05), ctx.sampleRate);
@@ -81,6 +81,37 @@ function tone(
   osc.connect(g).connect(out);
   osc.start(start);
   osc.stop(start + dur + 0.02);
+}
+
+/** Bunyi pembuka: dengung rendah yang naik saat blob logam mengembang, desis
+ *  kilau saat kilaunya menyapu, dan dua denting kecil saat menjadi terminal. */
+export function sfxBlob() {
+  const a = ready();
+  if (!a) return;
+  const { c, out } = a;
+  const t = c.currentTime;
+  // dengung "whoom" sepanjang blob mengembang
+  tone(c, out, { freq: 70, to: 210, start: t, dur: 1.5, vol: 0.22, type: "sine" });
+  tone(c, out, { freq: 140, to: 420, start: t + 0.05, dur: 1.4, vol: 0.06, type: "triangle" });
+  // desis kilau: derau yang disaring dan disapu ke nada tinggi
+  const src = c.createBufferSource();
+  src.buffer = a.noise;
+  src.loop = true;
+  const bp = c.createBiquadFilter();
+  bp.type = "bandpass";
+  bp.Q.value = 6;
+  bp.frequency.setValueAtTime(1200, t + 0.6);
+  bp.frequency.exponentialRampToValueAtTime(7000, t + 2.0);
+  const g = c.createGain();
+  g.gain.setValueAtTime(0.0001, t + 0.6);
+  g.gain.linearRampToValueAtTime(0.08, t + 1.0);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 2.1);
+  src.connect(bp).connect(g).connect(out);
+  src.start(t + 0.6);
+  src.stop(t + 2.2);
+  // denting kecil saat logam mencair menjadi terminal
+  tone(c, out, { freq: 1320, start: t + 1.8, dur: 0.35, vol: 0.05 });
+  tone(c, out, { freq: 1980, start: t + 1.93, dur: 0.4, vol: 0.035 });
 }
 
 /** Bunyi tuts keyboard: klik derau pendek, nadanya sedikit acak tiap tuts. */
@@ -142,6 +173,16 @@ export function sfxBoing() {
     tone(c, out, { freq: 300, to: 620, start: t, dur: 0.12, vol: 0.14 });
     tone(c, out, { freq: 620, to: 420, start: t + 0.1, dur: 0.22, vol: 0.1 });
   });
+}
+
+/** Bunyi Mochi mendarat setelah melompat (otomatis, tanpa klik). */
+export function sfxLand() {
+  const a = ready();
+  if (!a) return;
+  const { c, out } = a;
+  const t = c.currentTime;
+  tone(c, out, { freq: 180, to: 90, start: t, dur: 0.12, vol: 0.16, type: "triangle" });
+  tone(c, out, { freq: 520, to: 380, start: t + 0.04, dur: 0.16, vol: 0.06 });
 }
 
 /** Bunyi konfirmasi saat suara dinyalakan. */
