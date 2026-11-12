@@ -14,7 +14,9 @@ import { Contact } from "@/components/sections/Contact";
 import { Hero } from "@/components/sections/Hero";
 import { Projects } from "@/components/sections/Projects";
 import { Skills } from "@/components/sections/Skills";
+import { CommandPalette } from "@/components/command/CommandPalette";
 import { InlineScript } from "@/components/ui/InlineScript";
+import { Toaster } from "@/components/ui/Toaster";
 
 export default function Page() {
   return (
@@ -42,6 +44,10 @@ export default function Page() {
 
         <Footer />
       </div>
+
+      {/* Ctrl/⌘+K: perintah cepat; notifikasi kecil di bawah layar */}
+      <CommandPalette />
+      <Toaster />
     </>
   );
 }

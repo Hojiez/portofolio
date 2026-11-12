@@ -4,6 +4,7 @@ import { Icon, ICON } from "@/components/ui/Icon";
 import { MetalText } from "@/components/ui/MetalText";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { CopyEmail } from "./CopyEmail";
 import { FOCUS, PANEL } from "@/components/ui/styles";
 
 /* Penutup: "Let's talk." raksasa bergaya logam, lalu email dan sosial media
@@ -33,12 +34,15 @@ export function Contact() {
         <div className="relative mt-10 flex flex-col gap-8 border-t border-line pt-8 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="max-w-sm text-lg text-muted">Hiring, building something, or curious about one of the projects? Send me an email.</p>
-            <a
-              href={`mailto:${SITE.email}`}
-              className={`mt-3 inline-flex items-center gap-2 break-all rounded font-[family-name:var(--font-mono)] text-lg text-accent underline decoration-accent/40 underline-offset-4 hover:decoration-accent sm:text-2xl ${FOCUS}`}
-            >
-              {SITE.email}
-            </a>
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <a
+                href={`mailto:${SITE.email}`}
+                className={`inline-flex items-center gap-2 break-all rounded font-[family-name:var(--font-mono)] text-lg text-accent underline decoration-accent/40 underline-offset-4 hover:decoration-accent sm:text-2xl ${FOCUS}`}
+              >
+                {SITE.email}
+              </a>
+              <CopyEmail />
+            </div>
           </div>
 
           <ul className="flex flex-wrap gap-3">

@@ -7,6 +7,7 @@ import { sfxBoing, sfxLand } from "@/components/intro/sfx";
 import { FOCUS } from "@/components/ui/styles";
 import type { MascotExpression } from "./expressions";
 import { getLine, setActiveSeat, setLine } from "./guideStore";
+import { MOCHI_REACT_EVENT, type MochiReaction } from "./mochiEvents";
 import { burst } from "./fx";
 import { GuideGear } from "./GuideGear";
 import { Mascot, type MascotLook } from "./Mascot";
@@ -499,6 +500,25 @@ export function Guide() {
       }
     }, 6500);
     return () => window.clearInterval(id);
+  }, [act, clear, rest]);
+
+  // Reaksi yang diminta bagian lain situs (mochiEvents.ts), misalnya saat
+  // email disalin atau perintah rahasia diketik di command palette.
+  useEffect(() => {
+    const ACT_FOR: Record<MochiReaction, string> = { cheer: "spin", trick: "backflip", smirk: "smirk" };
+    const onReact = (e: Event) => {
+      const reaction = (e as CustomEvent<MochiReaction>).detail;
+      if (!visibleRef.current || traveling.current) return;
+      const a = reducedMotion() ? ACTS[ACT_FOR[reaction]] : act(ACT_FOR[reaction]);
+      if (speaking.current) return; // wajah bicara tetap, hanya badannya bereaksi
+      clear("poke");
+      setExpression(a.expression ?? "happy");
+      timers.current.poke = window.setTimeout(() => {
+        if (!speaking.current) rest();
+      }, a.duration + 500);
+    };
+    window.addEventListener(MOCHI_REACT_EVENT, onReact);
+    return () => window.removeEventListener(MOCHI_REACT_EVENT, onReact);
   }, [act, clear, rest]);
 
   /* Diklik: reaksi acak (berputar, penyet, memantul, salto, bergoyang) dengan

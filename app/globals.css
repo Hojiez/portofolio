@@ -171,6 +171,30 @@ body {
 /* Cadangan shader: cakram logam dari CSS (components/ui/MetalShader.tsx) */
 /* Bola krom: kilau utama kiri atas, pantulan langit-tanah berupa pita
    horizontal, dan bayangan di tepi supaya terlihat membulat (bukan kerucut). */
+/* Notifikasi kecil (components/ui/Toaster.tsx) dan command palette
+   (components/command/CommandPalette.tsx): muncul dengan naik & memudar. */
+.toast-in {
+  animation: toast-in 220ms ease-out;
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+.palette-in {
+  animation: palette-in 180ms ease-out;
+}
+@keyframes palette-in {
+  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+.palette-fade {
+  animation: palette-fade 180ms ease-out;
+}
+@keyframes palette-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 /* Bingkai krom untuk foto di About (components/ui/Portrait.tsx): pita
    gradien logam selebar padding, garis kilau tipis di tepi dalam, dan
    kilau yang menyapu pelan saat disentuh kursor. */
@@ -594,6 +618,13 @@ html[data-intro="show"] .intro-overlay[data-phase="intro"] .intro-window {
     animation: none;
   }
   .metal-frame::after {
+    transition: none;
+  }
+  .toast-in,
+  .palette-in,
+  .palette-fade,
+  .scroll-progress {
+    animation: none;
     transition: none;
   }
 }

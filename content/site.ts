@@ -31,7 +31,7 @@ export const SITE = {
   photo: "/profile.jpg",
   // >>> GANTI DENGAN DATA KAMU: alamat situs setelah online, misalnya
   //     "https://rauh.vercel.app". Kosongkan "" kalau belum ada.
-  url: "",
+  url: "https://portofolio-gbos.vercel.app",
 };
 
 // >>> GANTI DENGAN DATA KAMU: link sosial media (hapus / tambah baris sesukamu)
