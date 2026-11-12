@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Font otomatis di-host oleh Next.js. Variabel CSS-nya dipakai di komponen
+// lewat font-[family-name:var(--font-inter)] dan var(--font-mono).
+const inter = Inter({
   subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const mono = JetBrains_Mono({
   subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -19,11 +23,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en" className="h-full antialiased">
+      {/* Variabel font dipasang di <body>, bukan <html>, supaya tidak bentrok
+          dengan variabel tema Tailwind yang ditulis di :root. */}
+      <body className={`${inter.variable} ${mono.variable} min-h-full flex flex-col`}>
+        {children}
+      </body>
     </html>
   );
 }

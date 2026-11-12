@@ -8,8 +8,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,4 +22,20 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Smooth scroll + animasi orb latar. Kelas .orb-* dipakai di
+   components/layout/Background.tsx. */
+html {
+  scroll-behavior: smooth;
+}
+@keyframes orb-a { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(6vw,8vh) scale(1.15); } }
+@keyframes orb-b { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-8vw,-6vh) scale(1.1); } }
+@keyframes orb-c { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(4vw,-10vh) scale(0.9); } }
+.orb-a { animation: orb-a 22s ease-in-out infinite; }
+.orb-b { animation: orb-b 28s ease-in-out infinite; }
+.orb-c { animation: orb-c 34s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .orb-a, .orb-b, .orb-c { animation: none; }
 }
