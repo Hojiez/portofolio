@@ -27,7 +27,8 @@ const CERT = {
    tampil 340px dikurangi padding, dibagi rasio kertas A4), selebar area,
    lalu hampir dua kali lebar area untuk membaca detail. */
 const VIEW_H = 480;
-const ZOOMS = [`calc((${VIEW_H}px - 1.5rem) / 1.4142)`, "100%", "180%"];
+// (di HP yang sempit, "seluruh halaman" dibatasi selebar area supaya tidak terpotong)
+const ZOOMS = [`min(100%, calc((${VIEW_H}px - 1.5rem) / 1.4142))`, "100%", "180%"];
 
 function ToolButton({
   label,
