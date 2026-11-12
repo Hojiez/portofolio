@@ -98,6 +98,9 @@ export type ProjectDetails = {
   learned?: string;
 };
 
+// Peran Rauh di semua project (kata Rauh: ketua tim, ±80% pengerjaan).
+const LEAD = "Team lead. I planned the work, split the tasks and wrote about 80% of the code.";
+
 // >>> GANTI DENGAN DATA KAMU: daftar project
 export const PROJECTS: Project[] = [
   {
@@ -121,6 +124,9 @@ export const PROJECTS: Project[] = [
         "Admin dashboard with revenue trend, top-selling products and AI sales insights.",
         "Customers can track orders, see their history and leave reviews.",
       ],
+      role: LEAD,
+      challenge:
+        "Keeping three roles apart. Every route has to know who is calling, so the JWT check lives in middleware with a list of allowed roles per route instead of being repeated in each handler. Gemini was the other tricky part: when its reply crashes or doesn't parse, the dashboard shows a fallback message instead of breaking.",
     },
   },
   {
@@ -138,6 +144,9 @@ export const PROJECTS: Project[] = [
         "Laravel 11 backend with an SQLite database.",
       ],
       highlights: ["I went to the shop in person to see how the owner sells and keeps track of stock before the system was built."],
+      role: LEAD,
+      challenge:
+        "Building for a real person instead of a class brief. What the owner actually does at the counter decided the screens and the database, so the visit to the shop came before any design.",
     },
   },
   {
@@ -154,6 +163,9 @@ export const PROJECTS: Project[] = [
         "Endpoints for login, product CRUD and transactions.",
         "Admin stats, revenue trend and top-selling queries ported from the Node.js version.",
       ],
+      role: LEAD,
+      challenge:
+        "Porting from JavaScript to Go. Every database row needs an explicit type and every call returns an error to handle, where the Node.js version let those slide.",
     },
   },
   {
@@ -170,6 +182,9 @@ export const PROJECTS: Project[] = [
         "Checkout runs inside a database transaction (BEGIN, COMMIT, ROLLBACK), so a failed order never leaves stock half-updated.",
         "Case-insensitive product search.",
       ],
+      role: LEAD,
+      challenge:
+        "Checkout touches several tables at once. If one write failed halfway, stock could end up wrong, so the whole checkout runs in a single transaction and rolls back on any error.",
     },
   },
   {
@@ -188,6 +203,9 @@ export const PROJECTS: Project[] = [
         "Exercises with a history of completed sessions and feedback after each one.",
       ],
       highlights: ["An SOS alert page for patients.", "An admin panel that can reset weekly progress for everyone."],
+      role: LEAD,
+      challenge:
+        "Separating weekly progress from history. Exercise history is stored in its own table, so the admin can reset everyone's week without losing what patients have done before.",
     },
   },
   {
@@ -210,6 +228,9 @@ export const PROJECTS: Project[] = [
         "TypeScript throughout.",
         "Exported to a static web build and deployed on Vercel, so it runs in a browser too.",
       ],
+      role: LEAD,
+      challenge:
+        "Learning file-based routing: in Expo Router the folder structure is the navigation, so getting tabs and a stack screen to share one layout meant planning the folders first.",
     },
   },
   {
@@ -228,6 +249,9 @@ export const PROJECTS: Project[] = [
         "A CustomTkinter window to start and stop watching, with settings saved locally.",
       ],
       highlights: ["Joins the Roblox server by its place ID and sends a desktop notification when it does."],
+      role: LEAD,
+      challenge:
+        "Keeping the window responsive. The watcher runs its own asyncio loop on a separate thread and sends updates back to the GUI through a thread-safe callback, because Tkinter freezes if anything else touches it directly.",
     },
   },
   {
@@ -250,6 +274,9 @@ export const PROJECTS: Project[] = [
         "A particle background and frosted-glass panels.",
         "A click-to-enter screen that starts a music player on shuffle.",
       ],
+      role: LEAD,
+      challenge:
+        "Getting music to play at all. Browsers block audio until the visitor interacts with the page, which is why the site opens with a click-to-enter screen.",
     },
   },
 ];
