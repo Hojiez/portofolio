@@ -5,8 +5,8 @@ import { useRef } from "react";
 import { useShaderGate } from "@/components/ui/useShaderGate";
 
 /*
- * Latar gelombang logam: pita-pita perak yang meliuk sangat pelan di
- * belakang seluruh halaman. Dibuat megah tapi halus: transparan, memudar ke
+ * Latar gelombang logam: pita-pita perak yang terus bergerak mengalun seperti
+ * ombak di belakang seluruh halaman. Dibuat megah tapi halus: transparan, memudar ke
  * arah bawah, dan digambar beresolusi rendah (latar buram tidak butuh detail,
  * dan ini menghemat kerja kartu grafis).
  *
@@ -36,7 +36,7 @@ export function MetalWaves() {
           shapeScale={0.25}
           rotation={20}
           scale={2.4}
-          speed={0.1}
+          speed={0.45}
           minPixelRatio={0.6}
           maxPixelCount={900_000}
         />

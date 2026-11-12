@@ -397,6 +397,43 @@ html[data-intro="show"] .intro-overlay[data-phase="intro"] .intro-window {
   transform: none;
 }
 
+/* Perlengkapan Mochi saat berpindah (components/guide/GuideGear.tsx) */
+.gear-pop {
+  animation: gear-pop 220ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes gear-pop {
+  from { opacity: 0; transform: translateX(-50%) scale(0.6); }
+  to { opacity: 1; transform: translateX(-50%) scale(1); }
+}
+.gear-flame {
+  display: block;
+  width: 12px;
+  height: 22px;
+  border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+  background: radial-gradient(ellipse at 50% 25%, #ffffff 0%, #8fd8ff 30%, #ffb347 60%, rgba(255, 120, 40, 0) 100%);
+  transform-origin: top center;
+  animation: gear-flame 90ms ease-in-out infinite alternate;
+}
+@keyframes gear-flame {
+  from { transform: scaleY(0.75); opacity: 0.85; }
+  to { transform: scaleY(1.2); opacity: 1; }
+}
+/* Partikel (components/guide/fx.ts) */
+.fx-dust,
+.fx-spark {
+  position: absolute;
+  z-index: 25;
+  pointer-events: none;
+  border-radius: 9999px;
+}
+.fx-dust {
+  background: radial-gradient(circle, rgba(200, 206, 214, 0.55), rgba(200, 206, 214, 0) 70%);
+}
+.fx-spark {
+  background: #fff;
+  box-shadow: 0 0 8px 2px rgba(143, 216, 255, 0.8);
+}
+
 /* Mochi (components/guide/Guide.tsx). Perpindahan antar kursi berupa lompatan
    yang dianimasikan dari JavaScript; di sini hanya muncul/hilangnya. */
 .guide-mochi {

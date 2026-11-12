@@ -7,7 +7,10 @@ import { sfxBoing, sfxLand } from "@/components/intro/sfx";
 import { FOCUS } from "@/components/ui/styles";
 import type { MascotExpression } from "./expressions";
 import { getLine, setActiveSeat, setLine } from "./guideStore";
+import { burst } from "./fx";
+import { GuideGear } from "./GuideGear";
 import { Mascot, type MascotLook } from "./Mascot";
+import { ACTS, CLICK_ACTS, IDLE_ACTS, pick, randomMove, type Gear, type Pos } from "./moves";
 import { playVoice, stopVoice, useStopVoiceWhenMuted, wordTimings } from "./useVoice";
 
 /*
@@ -31,7 +34,6 @@ const SECTION_SEATS: SeatId[] = ["hero", "about", "projects", "skills", "contact
 const SIZE = 88; // ukuran Mochi di layar lebar (sama dengan kotak kursi)
 const DOCK_SIZE = 64; // ukuran Mochi saat menempel di pojok (HP)
 const DWELL = 450; // ms kursi harus berada di tengah layar sebelum aktif
-const HOP_MS = 950; // ms durasi lompatan antar kursi
 const WORD_MS = 115; // jeda antar kata
 const PAUSE_MS = 280; // jeda setelah tanda baca
 const REACT_MS = 2400; // lama ekspresi reaksi setelah selesai bicara
@@ -51,7 +53,7 @@ const isMobile = () => window.matchMedia(MOBILE).matches;
 const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const introOpen = () => document.documentElement.getAttribute("data-intro") === "show";
 
-type TimerKey = "dwell" | "arrive" | "speak" | "react" | "poke" | "land";
+type TimerKey = "dwell" | "arrive" | "speak" | "react" | "poke" | "land" | "gear";
 
 export function Guide() {
   const docked = useSyncExternalStore(subscribeMobile, isMobile, () => false);
@@ -59,12 +61,19 @@ export function Guide() {
   const [expression, setExpression] = useState<MascotExpression>("idle");
   const [look, setLook] = useState<MascotLook | undefined>(undefined);
 
+  const [gear, setGear] = useState<Gear>(null);
+
   const mochiRef = useRef<HTMLDivElement>(null);
+  const actorRef = useRef<HTMLDivElement>(null);
+  const visibleRef = useRef(false);
+  const traveling = useRef(false);
+  const hovering = useRef(false);
+  const clicks = useRef<number[]>([]);
   const active = useRef<SeatId | null>(null);
   const speaking = useRef(false);
   const speakToken = useRef(0); // naik setiap ada kalimat baru; membatalkan yang lama
   useStopVoiceWhenMuted();
-  const lastPos = useRef<{ x: number; y: number } | null>(null);
+  const lastPos = useRef<Pos | null>(null);
   const timers = useRef<Partial<Record<TimerKey, number>>>({});
 
   const clear = useCallback((key: TimerKey) => window.clearTimeout(timers.current[key]), []);
@@ -88,38 +97,47 @@ export function Guide() {
     return pos;
   }, []);
 
-  /* Lompatan dari satu kursi ke kursi lain: jongkok, melayang melengkung
-     sambil memanjang, lalu mendarat "penyet" seperti jeli. */
-  const hop = useCallback((from: { x: number; y: number }, to: { x: number; y: number }) => {
+  /* Pindah ke kursi baru dengan salah satu dari delapan gerakan acak
+     (moves.ts): lompat, hantam tanah, skateboard, jetpack, gasing,
+     pantul-pantul, teleport, atau payung. Mengembalikan durasinya (ms). */
+  const travel = useCallback((from: Pos, to: Pos) => {
     const el = mochiRef.current;
-    if (!el) return;
-    const peak = Math.min(from.y, to.y) - Math.min(220, 90 + Math.abs(to.y - from.y) * 0.06);
-    const at = (x: number, y: number, sx = 1, sy = 1) => `translate(${x}px, ${y}px) scale(${sx}, ${sy})`;
-    el.animate(
-      [
-        { offset: 0, transform: at(from.x, from.y) },
-        { offset: 0.14, transform: at(from.x, from.y + 6, 1.14, 0.84), easing: "cubic-bezier(0.3, 0, 0.6, 1)" },
-        { offset: 0.5, transform: at((from.x + to.x) / 2, peak, 0.9, 1.14), easing: "cubic-bezier(0.4, 0, 0.7, 0.4)" },
-        { offset: 0.86, transform: at(to.x, to.y, 1.2, 0.8), easing: "ease-out" },
-        { offset: 1, transform: at(to.x, to.y) },
-      ],
-      { duration: HOP_MS }
-    );
-    timers.current.land = window.setTimeout(sfxLand, HOP_MS * 0.86);
+    if (!el) return 0;
+    const mv = randomMove(from, to);
+    traveling.current = true;
+    setGear(mv.gear);
+    setExpression(mv.expression);
+    el.animate(mv.frames, { duration: mv.duration });
+    timers.current.land = window.setTimeout(sfxLand, mv.duration * mv.land);
+    // partikel: debu di bawah kaki, percikan di tengah badan
+    mv.fx.forEach((f) => {
+      const p = f.where === "from" ? from : to;
+      const y = f.kind === "dust" ? p.y + SIZE * 0.92 : p.y + SIZE / 2;
+      window.setTimeout(() => burst(f.kind, p.x + SIZE / 2, y), mv.duration * f.at);
+    });
+    timers.current.gear = window.setTimeout(() => {
+      setGear(null);
+      traveling.current = false;
+    }, mv.duration);
+    return mv.duration;
   }, []);
 
-  /* Di HP: lompatan kecil di pojok setiap pindah section. */
-  const hopInPlace = useCallback(() => {
-    mochiRef.current?.animate(
-      [
-        { transform: "translateY(0) scale(1, 1)" },
-        { transform: "translateY(2px) scale(1.12, 0.86)", offset: 0.15 },
-        { transform: "translateY(-26px) scale(0.92, 1.1)", offset: 0.5 },
-        { transform: "translateY(0) scale(1.15, 0.85)", offset: 0.85 },
-        { transform: "translateY(0) scale(1, 1)" },
-      ],
-      { duration: 600, easing: "ease-in-out" }
-    );
+  /* Gerakan di tempat pada badan Mochi (tidak mengubah posisinya): animasi
+     diam, reaksi klik, dan perpindahan di HP. */
+  const act = useCallback((name: string) => {
+    const a = ACTS[name];
+    actorRef.current?.animate(a.frames, { duration: a.duration, easing: "ease-in-out" });
+    return a;
+  }, []);
+
+  /* Percikan di sekitar Mochi (misalnya saat pusing diklik berkali-kali). */
+  const sparkleHere = useCallback(() => {
+    const el = mochiRef.current;
+    const page = document.getElementById("page");
+    if (!el || !page) return;
+    const r = el.getBoundingClientRect();
+    const p = page.getBoundingClientRect();
+    burst("sparks", r.left - p.left + r.width / 2, r.top - p.top + r.height / 2);
   }, []);
 
   /* Suasana hati di luar kalimat (diatur efek "curious/sleep" di bawah). */
@@ -234,18 +252,20 @@ export function Guide() {
       lastPos.current = to;
       setVisible(true);
 
-      const jumps = !first && !reducedMotion();
-      if (jumps && from && to) {
-        setExpression("idle");
-        setLook({ x: 0, y: to.y > from.y ? 0.8 : -0.8 }); // menoleh ke arah lompatan
-        hop(from, to);
-      } else if (jumps && isMobile()) {
-        hopInPlace();
+      visibleRef.current = true;
+
+      const moves = !first && !reducedMotion();
+      let wait = first ? 450 : 150;
+      if (moves && from && to) {
+        setLook({ x: 0, y: to.y > from.y ? 0.8 : -0.8 }); // menoleh ke arah tujuan
+        wait = travel(from, to);
+      } else if (moves && isMobile()) {
+        // di HP Mochi tetap di pojok; gerakan kecil acak tanda pindah section
+        wait = act(pick(["bounce", "spin", "squish", "wiggle"])).duration;
       }
-      const wait = jumps && from && to ? HOP_MS : first ? 450 : jumps ? 400 : 150;
       timers.current.arrive = window.setTimeout(() => speak(id), wait);
     },
-    [clear, place, speak, hop, hopInPlace]
+    [clear, place, speak, travel, act]
   );
 
   // Pantau kursi mana yang sedang berada di tengah layar.
@@ -397,15 +417,53 @@ export function Guide() {
     if (active.current) lastPos.current = place(active.current);
   }, [docked, place]);
 
-  /* Diklik: memantul dan tersenyum (bunyi "boing" jika suara aktif). */
+  // Animasi diam acak: sesekali Mochi memantul, berputar, bergoyang, penyet,
+  // atau mengintip, selama ia sedang tidak bicara, berpindah, tidur, atau
+  // disentuh kursor.
+  useEffect(() => {
+    if (reducedMotion()) return;
+    const id = window.setInterval(() => {
+      const m = mood.current;
+      if (!visibleRef.current || speaking.current || traveling.current || m.sleeping || hovering.current) return;
+      if (document.hidden || Math.random() < 0.35) return;
+      const a = act(pick(IDLE_ACTS));
+      if (a.expression) {
+        clear("poke");
+        setExpression(a.expression);
+        timers.current.poke = window.setTimeout(() => {
+          if (!speaking.current) rest();
+        }, a.duration + 300);
+      }
+    }, 6500);
+    return () => window.clearInterval(id);
+  }, [act, clear, rest]);
+
+  /* Diklik: reaksi acak (berputar, penyet, memantul, salto, bergoyang) dengan
+     bunyi "boing". Diklik 5 kali dalam 2,5 detik: Mochi pusing berputar-putar. */
   const poke = () => {
     sfxBoing();
-    if (speaking.current) return;
+    const now = performance.now();
+    clicks.current = [...clicks.current.filter((t) => now - t < 2500), now];
+    const dizzy = clicks.current.length >= 5;
+    if (dizzy) clicks.current = [];
+    const a = reducedMotion() ? ACTS.squish : act(dizzy ? "dizzy" : pick(CLICK_ACTS));
+    if (dizzy) window.setTimeout(sparkleHere, a.duration * 0.7);
+    if (speaking.current) return; // wajah bicara tetap, hanya badannya bereaksi
     clear("poke");
-    setExpression("happy");
+    setExpression(a.expression ?? pick<MascotExpression>(["happy", "smug"]));
     timers.current.poke = window.setTimeout(() => {
       if (!speaking.current) rest();
-    }, 1100);
+    }, a.duration + 400);
+  };
+
+  /* Kursor di atas Mochi: Mochi menatap kursor. */
+  const hoverIn = () => {
+    hovering.current = true;
+    if (!speaking.current && !mood.current.sleeping) setLook("cursor");
+  };
+  const hoverOut = () => {
+    hovering.current = false;
+    if (!speaking.current && !traveling.current) rest();
   };
 
   return (
@@ -416,21 +474,28 @@ export function Guide() {
         visible ? "opacity-100" : "pointer-events-none opacity-0"
       }`}
     >
-      <button
-        type="button"
-        onClick={poke}
-        tabIndex={visible ? 0 : -1}
-        aria-label="Mochi, the site's guide. Click to say hi."
-        className={`block rounded-full ${FOCUS}`}
-      >
-        {/* Mochi (dan shader WebGL-nya) baru dibuat saat pertama kali muncul,
-            supaya tidak membebani saat halaman dibuka */}
-        {visible ? (
-          <Mascot expression={expression} look={look} size={docked ? DOCK_SIZE : SIZE} />
-        ) : (
-          <span className="block" style={{ width: docked ? DOCK_SIZE : SIZE, height: docked ? DOCK_SIZE : SIZE }} />
-        )}
-      </button>
+      {/* badan Mochi untuk animasi di tempat (diam, klik), terpisah dari
+          pembungkus luar yang menyimpan posisi di halaman */}
+      <div ref={actorRef} className="relative">
+        <GuideGear gear={gear} />
+        <button
+          type="button"
+          onClick={poke}
+          onPointerEnter={hoverIn}
+          onPointerLeave={hoverOut}
+          tabIndex={visible ? 0 : -1}
+          aria-label="Mochi, the site's guide. Click to say hi."
+          className={`relative block rounded-full ${FOCUS}`}
+        >
+          {/* Mochi (dan shader WebGL-nya) baru dibuat saat pertama kali muncul,
+              supaya tidak membebani saat halaman dibuka */}
+          {visible ? (
+            <Mascot expression={expression} look={look} size={docked ? DOCK_SIZE : SIZE} />
+          ) : (
+            <span className="block" style={{ width: docked ? DOCK_SIZE : SIZE, height: docked ? DOCK_SIZE : SIZE }} />
+          )}
+        </button>
+      </div>
     </div>
   );
 }
