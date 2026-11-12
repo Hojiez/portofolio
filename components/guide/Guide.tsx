@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { SCRIPT, wordsOf, type SeatId } from "@/content/script";
+import { lineOf, SCRIPT, wordsOf, type LinePart, type SeatId } from "@/content/script";
 import { INTRO_DONE_EVENT } from "@/components/intro/introState";
 import { sfxBoing, sfxLand } from "@/components/intro/sfx";
 import { FOCUS } from "@/components/ui/styles";
@@ -27,6 +27,9 @@ import { playVoice, stopVoice, useStopVoiceWhenMuted, wordTimings } from "./useV
  *     mengulang kalimatnya.
  *   - Pindah kursi di tengah kalimat: sisa kalimat lama langsung tampil utuh.
  *   - Kalimat hero diucapkan tepat setelah intro ditutup.
+ *   - Pengunjung diam di satu section tanpa scroll selama MORE_MS setelah
+ *     kalimat utama selesai: Mochi menyeringai, lalu mengucapkan kalimat
+ *     tambahan section itu (sekali per kunjungan). Scroll mengulang hitungan.
  */
 
 const SECTION_SEATS: SeatId[] = ["hero", "about", "projects", "skills", "contact"];
@@ -37,6 +40,7 @@ const DWELL = 450; // ms kursi harus berada di tengah layar sebelum aktif
 const WORD_MS = 115; // jeda antar kata
 const PAUSE_MS = 280; // jeda setelah tanda baca
 const REACT_MS = 2400; // lama ekspresi reaksi setelah selesai bicara
+const MORE_MS = 6000; // diam tanpa scroll selama ini: kalimat tambahan
 
 // Arah pandang saat bicara: ke balon teks.
 const LOOK_BUBBLE: MascotLook = { x: 0.65, y: 0.1 }; // balon di kanan Mochi
@@ -53,7 +57,7 @@ const isMobile = () => window.matchMedia(MOBILE).matches;
 const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const introOpen = () => document.documentElement.getAttribute("data-intro") === "show";
 
-type TimerKey = "dwell" | "arrive" | "speak" | "react" | "poke" | "land" | "gear";
+type TimerKey = "dwell" | "arrive" | "speak" | "react" | "poke" | "land" | "gear" | "more";
 
 export function Guide() {
   const docked = useSyncExternalStore(subscribeMobile, isMobile, () => false);
@@ -158,36 +162,79 @@ export function Guide() {
     }
   }, []);
 
-  /* Ekspresi reaksi sebentar setelah kalimat selesai, lalu kembali santai. */
-  const react = useCallback(
+  /* Kursi yang sedang menunggu kalimat tambahan (scroll mengulang hitungan). */
+  const moreFor = useRef<SeatId | null>(null);
+  const speakRef = useRef<(id: SeatId, part?: LinePart) => void>(() => {});
+
+  /* Mulai hitungan kalimat tambahan, jika kursi ini punya dan belum
+     diucapkan. */
+  const armMore = useCallback(
     (id: SeatId) => {
+      clear("more");
+      const line = getLine(id);
+      if (!SCRIPT[id].more || line.part !== 0 || !line.done) {
+        moreFor.current = null;
+        return;
+      }
+      moreFor.current = id;
+      const fire = () => {
+        // tunggu dulu jika Mochi sedang sibuk (bicara, pindah, tidur, disentuh)
+        if (active.current !== id) return;
+        if (speaking.current || traveling.current || mood.current.sleeping || hovering.current) {
+          timers.current.more = window.setTimeout(fire, MORE_MS);
+          return;
+        }
+        moreFor.current = null;
+        clear("poke");
+        clear("react");
+        setExpression("smirk");
+        setLook({ x: -0.35, y: 0 });
+        const wait = reducedMotion() ? 500 : act("smirk").duration;
+        timers.current.more = window.setTimeout(() => {
+          if (active.current === id) speakRef.current(id, 1);
+        }, wait);
+      };
+      timers.current.more = window.setTimeout(fire, MORE_MS);
+    },
+    [clear, act]
+  );
+
+  /* Ekspresi reaksi sebentar setelah kalimat selesai, lalu kembali santai.
+     Setelah kalimat utama, mulai hitungan kalimat tambahan. */
+  const react = useCallback(
+    (id: SeatId, part: LinePart) => {
       speaking.current = false;
-      setExpression(SCRIPT[id].expression);
+      setExpression(lineOf(id, part).expression);
       clear("react");
       timers.current.react = window.setTimeout(rest, REACT_MS);
+      if (part === 0) armMore(id);
     },
-    [clear, rest]
+    [clear, rest, armMore]
   );
 
   /* Ucapkan kalimat kursi kata demi kata (atau diam jika sudah pernah).
      Jika suara aktif, kata-kata dan gerak mulut mengikuti durasi file
      suaranya; jika mati atau gagal dimuat, memakai kecepatan teks biasa. */
   const speak = useCallback(
-    (id: SeatId) => {
+    (id: SeatId, part: LinePart = 0) => {
       clear("speak");
       clear("react");
       const token = ++speakToken.current;
-      const words = wordsOf(id);
-      const start = getLine(id);
-      if (start.done) {
+      const words = wordsOf(id, part);
+      const current = getLine(id);
+      // kembali ke kursi lama: kalimat utama sudah diucapkan, jadi yang
+      // berlaku adalah kalimat terakhir yang tampil di kursi itu
+      if (part === 0 && (current.part === 1 || current.done)) {
         rest();
+        armMore(id);
         return;
       }
+      const start = current.part === part ? current : { part, shown: 0, done: false };
       speaking.current = true;
       setExpression("talk");
       setLook(isMobile() ? LOOK_BUBBLE_DOCKED : LOOK_BUBBLE);
 
-      void playVoice(SCRIPT[id].voice).then((duration) => {
+      void playVoice(lineOf(id, part).voice).then((duration) => {
         // Mochi sudah pindah kursi selama menunggu file dimuat
         if (token !== speakToken.current) return;
         const t0 = performance.now();
@@ -195,8 +242,8 @@ export function Guide() {
 
         if (reducedMotion()) {
           // teks langsung utuh; suara (jika ada) tetap diputar sampai selesai
-          setLine(id, { shown: words.length, done: true });
-          timers.current.speak = window.setTimeout(() => react(id), left());
+          setLine(id, { part, shown: words.length, done: true });
+          timers.current.speak = window.setTimeout(() => react(id, part), left());
           return;
         }
 
@@ -205,10 +252,10 @@ export function Guide() {
         const step = () => {
           shown += 1;
           const done = shown >= words.length;
-          setLine(id, { shown, done });
+          setLine(id, { part, shown, done });
           if (done) {
             // tunggu suaranya selesai sebelum berhenti "bicara"
-            timers.current.speak = window.setTimeout(() => react(id), left());
+            timers.current.speak = window.setTimeout(() => react(id, part), left());
             return;
           }
           const wait = times
@@ -221,8 +268,11 @@ export function Guide() {
         step();
       });
     },
-    [clear, react, rest]
+    [clear, react, rest, armMore]
   );
+  useEffect(() => {
+    speakRef.current = speak;
+  }, [speak]);
 
   /* Pindahkan Mochi ke kursi baru, lalu bicara setelah sampai. */
   const activate = useCallback(
@@ -232,6 +282,8 @@ export function Guide() {
       clear("arrive");
       clear("speak");
       clear("react");
+      clear("more");
+      moreFor.current = null;
       // hentikan suara kalimat lama (hanya satu kalimat berbunyi sekaligus)
       speakToken.current++;
       stopVoice();
@@ -239,7 +291,8 @@ export function Guide() {
       // kalimat lama yang terpotong langsung ditampilkan utuh
       if (prev) {
         const line = getLine(prev);
-        if (line.shown > 0 && !line.done) setLine(prev, { shown: wordsOf(prev).length, done: true });
+        if (line.shown > 0 && !line.done)
+          setLine(prev, { part: line.part, shown: wordsOf(prev, line.part).length, done: true });
       }
       speaking.current = false;
       active.current = id;
@@ -411,6 +464,16 @@ export function Guide() {
       document.removeEventListener("pointerout", out);
     };
   }, [clear, rest]);
+
+  // Scroll mengulang hitungan kalimat tambahan: kalimat itu hanya untuk
+  // pengunjung yang diam di satu section.
+  useEffect(() => {
+    const onScroll = () => {
+      if (moreFor.current) armMore(moreFor.current);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [armMore]);
 
   // Berpindah antara mode HP (menempel di pojok) dan layar lebar.
   useEffect(() => {

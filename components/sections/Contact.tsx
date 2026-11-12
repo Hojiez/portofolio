@@ -32,7 +32,7 @@ export function Contact() {
       <Reveal step={1}>
         <div className="relative mt-10 flex flex-col gap-8 border-t border-line pt-8 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="max-w-sm text-lg text-muted">Have a project in mind, or just want to say hi?</p>
+            <p className="max-w-sm text-lg text-muted">Hiring, building something, or curious about one of the projects? Send me an email.</p>
             <a
               href={`mailto:${SITE.email}`}
               className={`mt-3 inline-flex items-center gap-2 break-all rounded font-[family-name:var(--font-mono)] text-lg text-accent underline decoration-accent/40 underline-offset-4 hover:decoration-accent sm:text-2xl ${FOCUS}`}

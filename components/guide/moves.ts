@@ -289,6 +289,21 @@ export const ACTS: Record<string, { frames: Keyframe[]; duration: number; expres
       { transform: "rotate(-360deg)" },
     ],
   },
+  /* menyeringai: miring ke samping, tahan sebentar sambil goyang kecil,
+     lalu kembali dengan pantulan */
+  smirk: {
+    duration: 1200,
+    expression: "smirk",
+    frames: [
+      { transform: "none", easing: "ease-out" },
+      { transform: "translateX(-5px) rotate(-12deg) scale(1.04, 0.96)", offset: 0.22 },
+      { transform: "translateX(-5px) rotate(-9deg)", offset: 0.4 },
+      { transform: "translateX(-5px) rotate(-13deg)", offset: 0.55 },
+      { transform: "translateX(-5px) rotate(-10deg)", offset: 0.7, easing: "ease-in" },
+      { transform: "translateY(-10px) rotate(3deg) scale(0.96, 1.05)", offset: 0.85 },
+      { transform: "none" },
+    ],
+  },
   dizzy: {
     duration: 1600,
     expression: "curious",
@@ -302,8 +317,8 @@ export const ACTS: Record<string, { frames: Keyframe[]; duration: number; expres
   },
 };
 
-export const IDLE_ACTS = ["bounce", "spin", "wiggle", "squish", "peek"];
-export const CLICK_ACTS = ["spin", "squish", "bounce", "backflip", "wiggle"];
+export const IDLE_ACTS = ["bounce", "spin", "wiggle", "squish", "peek", "smirk"];
+export const CLICK_ACTS = ["spin", "squish", "bounce", "backflip", "wiggle", "smirk"];
 
 export function pick<T>(list: T[]) {
   return list[Math.floor(Math.random() * list.length)];

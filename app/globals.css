@@ -492,6 +492,17 @@ html[data-intro="show"] .intro-overlay[data-phase="intro"] .intro-window {
   animation: mochi-z 2.4s ease-out infinite;
   opacity: 0;
 }
+/* alis menyeringai: naik-turun dua kali, lalu diam sebentar */
+.mochi-brow {
+  animation: mochi-brow 1.6s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes mochi-brow {
+  0%, 50%, 100% { transform: translateY(0); }
+  12%, 32% { transform: translateY(-6px) rotate(-6deg); }
+  22%, 42% { transform: translateY(0); }
+}
 @keyframes mochi-breathe {
   0%, 100% { transform: scale(1, 1); }
   50% { transform: scale(1.025, 0.97); }
@@ -548,5 +559,8 @@ html[data-intro="show"] .intro-overlay[data-phase="intro"] .intro-window {
   .mochi-z {
     animation: none;
     opacity: 1;
+  }
+  .mochi-brow {
+    animation: none;
   }
 }

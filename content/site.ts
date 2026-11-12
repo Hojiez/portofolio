@@ -15,7 +15,7 @@ export const SITE = {
   role: "Full-Stack Developer",
   // >>> GANTI DENGAN DATA KAMU: satu kalimat pembuka di hero
   tagline:
-    "I build practical software — quality-of-life tools, apps that bring local businesses online, and the interfaces people actually touch.",
+    "I build small tools that save people time, and web apps that move local shops from paper records to a real database.",
   // >>> GANTI DENGAN DATA KAMU: teks status kecil di atas nama (kosongkan "" untuk menyembunyikan)
   status: "Open to work",
   // >>> GANTI DENGAN DATA KAMU: lokasi
@@ -42,21 +42,21 @@ export const SOCIALS: { label: string; href: string }[] = [
 
 export const ABOUT = {
   // >>> GANTI DENGAN DATA KAMU: kalimat pembuka besar di About (ringkasan bio)
-  headline: "I got into code by poking at game security. Now I build things that make life a little easier.",
+  headline: "I learned to code by writing game cheats. Now I build apps for shops that still keep their records on paper.",
   // >>> GANTI DENGAN DATA KAMU: bio — tiap string = satu paragraf
   bio: [
-    "I'm a Computer Science student at BINUS University Malang. I got into programming through security: I started out making cheats for games, got curious about how game security actually works, and was already writing my own programs in junior high.",
-    "I like building quality-of-life tools, such as external apps that make games easier to play, and projects that help people directly, like bringing traditional shops into the modern era with a proper database behind them. Right now I'm studying operating systems and compilation techniques, and next I want to go deeper into cybersecurity.",
+    "I study Computer Science at BINUS University Malang. My first programs were game cheats. I wanted to know how games caught cheaters, so by junior high I was writing my own tools to find out.",
+    "I still like small tools that fix one annoying thing, like external helpers that make a game easier to play. I also like projects with a real person on the other end, such as moving a traditional shop's records into a proper database. Right now I'm studying operating systems and compiler construction. Cybersecurity is next.",
   ],
   // >>> GANTI DENGAN DATA KAMU: angka sorotan (maksimal 4 supaya rapi)
   // (dibuat sebagai getter supaya jumlah project otomatis mengikuti PROJECTS)
   get stats() {
     return [
       { value: "3+", label: "Years coding" },
-      { value: String(PROJECTS.length), label: "Projects shipped" },
-      { value: "C1", label: "English, certified Advanced" },
+      { value: String(PROJECTS.length), label: "Projects built" },
+      { value: "C1", label: "English (certified)" },
       // bahasa pemrograman di project: JavaScript, TypeScript, Go, Java, Python
-      { value: "5", label: "Languages shipped in" },
+      { value: "5", label: "Programming languages" },
     ];
   },
 };
@@ -80,7 +80,7 @@ export const PROJECTS: Project[] = [
   {
     title: "Furniture Store (v2)",
     description:
-      "Full-stack furniture store web app with JWT login, payments through Midtrans, and AI features powered by Google Gemini.",
+      "An online furniture store with JWT login, Midtrans payments, and Google Gemini for the AI features.",
     category: "Web",
     tech: ["Node.js", "Express", "PostgreSQL", "JWT", "Midtrans", "Gemini API"],
     liveUrl: "https://app-database-new.vercel.app",
@@ -89,7 +89,7 @@ export const PROJECTS: Project[] = [
   {
     title: "Furniture Store (Go)",
     description:
-      "The furniture store backend rewritten in Go with the Gin framework, connected to a MySQL database.",
+      "The same furniture store backend, rewritten in Go with Gin and a MySQL database.",
     category: "Backend",
     tech: ["Go", "Gin", "MySQL", "HTML"],
     repoUrl: "https://github.com/Hojiez/app_database_perabotan_golang",
@@ -97,7 +97,7 @@ export const PROJECTS: Project[] = [
   {
     title: "Furniture Store",
     description:
-      "CRUD database app for a furniture store, with an Express and PostgreSQL REST API and a simple web interface.",
+      "The first version: a CRUD app for a furniture store, with an Express and PostgreSQL REST API behind a plain web page.",
     category: "Backend",
     tech: ["Node.js", "Express", "PostgreSQL", "HTML"],
     repoUrl: "https://github.com/Hojiez/app_database_perabotan",
@@ -105,7 +105,7 @@ export const PROJECTS: Project[] = [
   {
     title: "Stroke Rehab",
     description:
-      "Web app for managing stroke patients' rehabilitation records, built with Spring Boot, Thymeleaf, and MySQL.",
+      "Keeps track of stroke patients' rehab records. Built with Spring Boot, Thymeleaf, and MySQL.",
     category: "Web",
     tech: ["Java", "Spring Boot", "Thymeleaf", "MySQL"],
     repoUrl: "https://github.com/Hojiez/rehab",
@@ -113,7 +113,7 @@ export const PROJECTS: Project[] = [
   {
     title: "Expo Assignment",
     description:
-      "React Native mobile app with Expo Router and tab navigation, built for a mobile app development course.",
+      "Coursework for a mobile development class: a React Native app with Expo Router and tab navigation.",
     category: "Mobile",
     tech: ["React Native", "Expo", "TypeScript"],
     repoUrl: "https://github.com/Hojiez/tugas-expo",
@@ -121,7 +121,7 @@ export const PROJECTS: Project[] = [
   {
     title: "Fish Watcher",
     description:
-      "Desktop app that watches Discord messages and automatically joins Roblox servers, with a GUI and desktop notifications.",
+      "Watches Discord messages and joins the Roblox server for you, then pings you with a desktop notification.",
     category: "Tools",
     tech: ["Python", "Playwright", "CustomTkinter"],
     repoUrl: "https://github.com/Hojiez/fish-watcher",
@@ -129,7 +129,7 @@ export const PROJECTS: Project[] = [
   {
     title: "rauh. — Old Portfolio",
     description:
-      "Dark, minimalist single-page portfolio with glassmorphism, a particle background, and a shuffle music player.",
+      "My previous portfolio, a single dark page with frosted-glass panels, floating particles, and a music player on shuffle.",
     category: "Web",
     tech: ["HTML", "Tailwind CSS", "JavaScript"],
     liveUrl: "https://hojiez.github.io/porto/",

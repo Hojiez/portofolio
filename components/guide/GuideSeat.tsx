@@ -1,6 +1,6 @@
 "use client";
 
-import { SCRIPT, wordsOf, type SeatId } from "@/content/script";
+import { lineOf, SCRIPT, wordsOf, type LinePart, type SeatId } from "@/content/script";
 import { useIsActiveSeat, useSeatLine } from "./guideStore";
 
 /*
@@ -12,14 +12,15 @@ import { useIsActiveSeat, useSeatLine } from "./guideStore";
  *   tidak pernah menutupi isi section, termasuk di HP.
  * - Balon hanya tampil selama Mochi duduk di kursi ini; saat Mochi pindah,
  *   balonnya memudar dan hilang.
- * - Semua kata sudah ada sejak awal tapi transparan, supaya tinggi kursi tidak
- *   berubah saat kata-kata muncul atau balon hilang.
+ * - Kalimat utama dan kalimat tambahan ditumpuk di sel grid yang sama, dan
+ *   semua kata sudah ada sejak awal tapi transparan, supaya tinggi kursi
+ *   tidak berubah saat kata-kata muncul, kalimat berganti, atau balon hilang.
  */
 export function GuideSeat({ id, className = "" }: { id: SeatId; className?: string }) {
   const line = useSeatLine(id);
   const here = useIsActiveSeat(id);
-  const words = wordsOf(id);
   const show = here && line.shown > 0;
+  const parts: LinePart[] = SCRIPT[id].more ? [0, 1] : [0];
 
   return (
     <div data-seat={id} className={`flex min-h-[88px] items-center gap-5 ${className}`}>
@@ -36,17 +37,26 @@ export function GuideSeat({ id, className = "" }: { id: SeatId; className?: stri
         <p className="mb-1 font-[family-name:var(--font-mono)] text-[11px] uppercase tracking-wider text-muted md:hidden">
           Mochi
         </p>
-        <p className="text-base leading-snug text-fg/90 md:text-lg">
-          {words.map((w, i) => (
-            <span key={i} className={`guide-word ${i < line.shown ? "is-on" : ""}`}>
-              {w}{" "}
-            </span>
+        <div className="grid">
+          {parts.map((part) => (
+            <p
+              key={part}
+              className={`text-base leading-snug text-fg/90 [grid-area:1/1] md:text-lg ${
+                part === line.part ? "" : "invisible"
+              }`}
+            >
+              {wordsOf(id, part).map((w, i) => (
+                <span key={i} className={`guide-word ${part === line.part && i < line.shown ? "is-on" : ""}`}>
+                  {w}{" "}
+                </span>
+              ))}
+            </p>
           ))}
-        </p>
+        </div>
       </div>
       {/* untuk pembaca layar: seluruh kalimat sekaligus, bukan kata demi kata */}
       <p className="sr-only" aria-live="polite">
-        {show ? `Mochi: ${SCRIPT[id].text}` : ""}
+        {show ? `Mochi: ${lineOf(id, line.part).text}` : ""}
       </p>
     </div>
   );

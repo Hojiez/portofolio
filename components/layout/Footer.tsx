@@ -18,7 +18,7 @@ export function Footer() {
         <p>
           © {year} {SITE.name}
         </p>
-        <p>Built with Next.js &amp; Tailwind CSS</p>
+        <p>Built with Next.js and Tailwind CSS. Mochi runs on shaders.</p>
       </div>
     </footer>
   );

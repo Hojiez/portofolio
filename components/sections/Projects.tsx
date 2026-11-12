@@ -152,7 +152,7 @@ export function Projects() {
       </ul>
 
       {visibleProjects.length === 0 && (
-        <p className={`rounded-2xl p-8 text-center text-muted ${PANEL}`}>No projects in this category yet.</p>
+        <p className={`rounded-2xl p-8 text-center text-muted ${PANEL}`}>Nothing in this category yet.</p>
       )}
     </section>
   );

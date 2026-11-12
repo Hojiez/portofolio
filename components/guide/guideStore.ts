@@ -1,20 +1,20 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { SEATS, type SeatId } from "@/content/script";
+import { SEATS, type LinePart, type SeatId } from "@/content/script";
 
 /*
  * Status pemandu yang dibagi antara Guide (yang menggerakkan Mochi) dan tiap
  * GuideSeat (yang menampilkan kalimat di section-nya).
  *
- * Per kursi: berapa kata sudah tampil, dan apakah kalimatnya sudah selesai.
- * Status ini hanya hidup selama halaman terbuka: "satu kalimat per kursi per
- * kunjungan".
+ * Per kursi: kalimat mana yang sedang tampil (utama atau tambahan), berapa
+ * kata sudah tampil, dan apakah kalimatnya sudah selesai. Status ini hanya
+ * hidup selama halaman terbuka: tiap kalimat diucapkan sekali per kunjungan.
  */
 
-export type SeatLine = { shown: number; done: boolean };
+export type SeatLine = { part: LinePart; shown: number; done: boolean };
 
-const EMPTY: SeatLine = { shown: 0, done: false };
+const EMPTY: SeatLine = { part: 0, shown: 0, done: false };
 
 let lines = Object.fromEntries(SEATS.map((id) => [id, EMPTY])) as Record<SeatId, SeatLine>;
 const listeners = new Set<() => void>();

@@ -145,6 +145,25 @@ function SleepFace() {
   );
 }
 
+/* Menyeringai: satu mata berkedip, satu alis naik-turun, senyum miring ke
+   satu sisi dengan lesung kecil. Dipakai sebelum kalimat tambahan. */
+function SmirkFace() {
+  return (
+    <g>
+      <Eye cx={72} cy={100} />
+      {/* mata kanan berkedip */}
+      <path d="M114 102 Q128 92 142 102" {...line} strokeWidth={6} />
+      {/* alis kiri terangkat, bergoyang naik-turun */}
+      <path className="mochi-brow" d="M56 76 Q70 66 86 74" {...line} strokeWidth={4.5} />
+      <path d="M116 84 Q128 82 140 86" {...line} strokeWidth={4.5} />
+      {/* senyum miring + lesung */}
+      <path d="M84 126 Q102 132 120 116" {...line} />
+      <path d="M120 116 L125 112" {...line} strokeWidth={4} />
+      <ellipse cx={146} cy={122} rx={11} ry={5.5} fill={BLUSH} opacity={0.45} />
+    </g>
+  );
+}
+
 const FACES: Record<MascotExpression, () => React.JSX.Element> = {
   idle: IdleFace,
   talk: TalkFace,
@@ -152,6 +171,7 @@ const FACES: Record<MascotExpression, () => React.JSX.Element> = {
   smug: SmugFace,
   curious: CuriousFace,
   sleep: SleepFace,
+  smirk: SmirkFace,
 };
 
 /* ---- Arah pandang 3D ----------------------------------------------------

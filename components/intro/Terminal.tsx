@@ -150,7 +150,7 @@ export function Terminal() {
     stopVoice(); // sapaan Mochi berhenti jika intro ditutup di tengah kalimat
     sfxEnter();
     // sapaan intro dihitung sudah diucapkan (satu kalimat per kursi)
-    setLine("intro", { shown: INTRO_WORDS.length, done: true });
+    setLine("intro", { part: 0, shown: INTRO_WORDS.length, done: true });
     markIntroSeen();
     window.setTimeout(() => setReleased(true), 700);
     // pindahkan fokus keyboard ke awal halaman

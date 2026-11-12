@@ -65,7 +65,7 @@ SAMPLES = [
 
 
 def load_lines() -> dict:
-    out = subprocess.check_output(["node", str(HERE / "export-lines.mjs")], cwd=ROOT, text=True)
+    out = subprocess.check_output(["node", str(HERE / "export-lines.mjs")], cwd=ROOT, text=True, encoding="utf-8")
     return json.loads(out)
 
 
@@ -97,7 +97,14 @@ def main() -> None:
             print(f"{path.relative_to(ROOT)}  {secs:.1f} s")
         return
 
+    # kalimat utama tiap kursi, ditambah kalimat tambahannya ("more") jika ada
+    todo = []
     for seat, line in lines.items():
+        todo.append((seat, line))
+        if line.get("more"):
+            todo.append((f"{seat}+", line["more"]))
+
+    for seat, line in todo:
         # line["voice"] berbentuk "/voice/hero.mp3" -> public/voice/hero.mp3
         path = ROOT / "public" / line["voice"].lstrip("/")
         if MODE == "babble":
