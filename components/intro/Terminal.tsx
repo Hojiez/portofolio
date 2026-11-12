@@ -73,8 +73,8 @@ type Step = [number, (p: Progress) => Progress, (() => void)?];
    (±3,7 detik) jika suara aktif. */
 function buildSchedule(): Step[] {
   const steps: Step[] = [];
-  // tunggu blob logam pembuka mengembang dan melebur jadi jendela (lihat .intro-egg)
-  steps.push([2100, (p) => p]);
+  // tunggu kotak logam pembuka bergoyang lalu melebur jadi jendela (lihat .intro-egg)
+  steps.push([1700, (p) => p]);
   for (let i = 1; i <= CMD.length; i++) {
     // spasi tidak berbunyi, supaya ritmenya terdengar seperti mengetik sungguhan
     const sound = CMD[i - 1] === " " ? undefined : sfxKey;
@@ -237,7 +237,7 @@ export function Terminal() {
 
       <div className="relative flex flex-1 items-center justify-center px-4">
         <div className="relative w-full max-w-[640px]">
-        {/* blob logam cair pembuka: mengembang dari telur kecil lalu melebur
+        {/* kotak logam cair pembuka seukuran jendela: bergoyang, lalu melebur
             menjadi jendela terminal di bawahnya */}
         <div aria-hidden="true" className="intro-egg pointer-events-none absolute inset-0 z-10" />
         <div className="intro-window relative w-full overflow-hidden rounded-2xl border border-line bg-surface/90 shadow-[0_40px_120px_-40px_rgba(0,0,0,0.9)]">

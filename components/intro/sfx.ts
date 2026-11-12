@@ -83,7 +83,7 @@ function tone(
   osc.stop(start + dur + 0.02);
 }
 
-/** Bunyi pembuka: dengung rendah yang naik saat blob logam mengembang, desis
+/** Bunyi pembuka: dengung rendah yang naik saat kotak logam bergoyang, desis
  *  kilau saat kilaunya menyapu, dan dua denting kecil saat menjadi terminal. */
 export function sfxBlob() {
   const a = ready();

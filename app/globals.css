@@ -218,45 +218,76 @@ html[data-intro="show"] {
 html[data-intro="show"] #page {
   visibility: hidden;
 }
-/* Pembuka: jendela terminal lahir sebagai blob logam cair yang mengembang dan
-   bergoyang, lalu lapisan logamnya mencair dan memperlihatkan terminal. */
-/* Hanya transform dan opacity yang dianimasikan: keduanya dikerjakan kartu
-   grafis tanpa menggambar ulang halaman. (Versi awal menganimasikan
-   border-radius jendela, dan itu membuat satu tugas 0,9 detik di HP.) */
+/* Pembuka: jendela terminal muncul sebagai kotak logam cair seukuran jendela
+   itu sendiri. Logam di dalamnya mengalir, kotaknya bergoyang seperti jeli,
+   lalu logamnya melebur dan memperlihatkan terminal di bawahnya.
+   Hanya transform dan opacity yang dianimasikan: keduanya dikerjakan kartu
+   grafis tanpa menggambar ulang halaman. (Versi yang menganimasikan
+   border-radius sempat membuat satu tugas 0,9 detik di HP.) */
 html[data-intro="show"] .intro-egg {
-  animation: intro-egg 2.2s cubic-bezier(0.3, 0.9, 0.3, 1) both;
+  animation: intro-egg 2.3s cubic-bezier(0.37, 0, 0.3, 1) both;
   will-change: transform, opacity;
 }
 html[data-intro="show"] .intro-window {
-  animation: intro-window-in 2.2s ease both;
+  animation: intro-window-in 2.3s ease both;
 }
+/* goyangan jeli: melebar-menyempit bergantian, makin lama makin tenang */
 @keyframes intro-egg {
-  0% { transform: scale(0.16, 0.22); opacity: 1; }
-  22% { transform: scale(0.34, 0.42); }
-  40% { transform: scale(0.6, 0.7); }
-  55% { transform: scale(0.88, 0.8); }
-  70% { transform: scale(1.05, 0.97); opacity: 1; }
-  84% { transform: scale(0.99, 1.02); }
+  0% { transform: scale(0.94); opacity: 0; }
+  8% { transform: scale(1.03, 0.97); opacity: 1; }
+  20% { transform: scale(0.975, 1.03); }
+  33% { transform: scale(1.02, 0.985); }
+  46% { transform: scale(0.99, 1.012); }
+  58% { transform: scale(1.006, 0.996); opacity: 1; }
+  72% { transform: scale(1); opacity: 1; }
   100% { transform: scale(1); opacity: 0; }
 }
 @keyframes intro-window-in {
-  0%, 62% { opacity: 0; transform: scale(0.97); }
-  100% { opacity: 1; transform: none; }
+  0%, 60% { opacity: 0; }
+  100% { opacity: 1; }
 }
 .intro-egg {
   /* tersembunyi di luar animasi pembuka (mis. saat intro ditutup) */
   opacity: 0;
   overflow: hidden;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 26%),
-    radial-gradient(ellipse 60% 35% at 70% 82%, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 70%),
-    radial-gradient(ellipse 40% 25% at 82% 18%, rgba(255, 214, 140, 0.45) 0%, rgba(255, 214, 140, 0) 70%),
-    linear-gradient(165deg, #f2f4f7 0%, #c9ced5 30%, #5d636c 48%, #1f2228 58%, #8d939c 78%, #e3e6ea 100%);
+  border-radius: 1rem; /* sama dengan sudut jendela terminal */
+  background: linear-gradient(165deg, #d9dde3 0%, #8d939c 45%, #2a2d33 60%, #b8bec6 100%);
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.25),
-    inset 0 -18px 40px rgba(120, 180, 255, 0.18),
-    inset 0 14px 30px rgba(255, 200, 120, 0.12);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3),
+    inset 0 -24px 60px rgba(120, 180, 255, 0.2),
+    inset 0 18px 40px rgba(255, 200, 120, 0.14),
+    0 40px 120px -40px rgba(0, 0, 0, 0.9);
+}
+/* logam cair yang mengalir: lapisan lebih besar dari kotak, digeser dan
+   diputar pelan (transform saja), dengan pantulan krom dan pinggiran warna */
+.intro-egg::before {
+  content: "";
+  position: absolute;
+  inset: -45%;
+  background:
+    radial-gradient(ellipse 22% 14% at 62% 40%, rgba(255, 210, 120, 0.55), transparent 70%),
+    radial-gradient(ellipse 26% 18% at 34% 66%, rgba(110, 170, 255, 0.4), transparent 70%),
+    radial-gradient(ellipse 30% 20% at 30% 30%, rgba(255, 255, 255, 0.95), transparent 70%),
+    radial-gradient(ellipse 34% 22% at 70% 72%, rgba(255, 255, 255, 0.7), transparent 70%),
+    radial-gradient(ellipse 40% 26% at 50% 52%, rgba(10, 12, 16, 0.85), transparent 72%),
+    radial-gradient(ellipse 30% 18% at 24% 80%, rgba(14, 16, 20, 0.7), transparent 70%),
+    linear-gradient(
+      150deg,
+      #f4f6f8 0%,
+      #c3c8cf 18%,
+      #5b6169 32%,
+      #e6e9ed 44%,
+      #2d3036 56%,
+      #aab0b8 68%,
+      #f0f2f5 80%,
+      #6b717a 100%
+    );
+  animation: intro-flow 2.3s cubic-bezier(0.45, 0, 0.3, 1) both;
+}
+@keyframes intro-flow {
+  0% { transform: translate(-8%, -6%) rotate(-12deg) scale(1); }
+  50% { transform: translate(6%, 4%) rotate(14deg) scale(1.08); }
+  100% { transform: translate(-2%, 8%) rotate(34deg) scale(1.02); }
 }
 /* kilau yang menyapu permukaan logam (digeser dengan transform) */
 .intro-egg::after {
@@ -268,7 +299,7 @@ html[data-intro="show"] .intro-window {
   width: 45%;
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent);
   transform: translateX(-120%) skewX(-18deg);
-  animation: intro-sheen 1.4s 0.55s ease-in-out both;
+  animation: intro-sheen 1.3s 0.35s ease-in-out both;
 }
 @keyframes intro-sheen {
   from { transform: translateX(-120%) skewX(-18deg); }

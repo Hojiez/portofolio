@@ -243,9 +243,9 @@ Fase 3 bisa dikerjakan bersamaan dengan fase 1 dan 2 karena tidak menyentuh file
 
 ## 11. Pembaruan setelah Fase 7
 
-- **Pembuka:** blob telur logam (CSS) mengembang dan melebur menjadi jendela terminal, dengan efek suara dengung + kilau. Hanya `transform` dan `opacity` yang dianimasikan; versi `border-radius` sempat membuat tugas 0,9 detik di HP.
+- **Pembuka:** kotak logam cair seukuran jendela terminal (CSS): logamnya mengalir, kotaknya bergoyang seperti jeli, lalu melebur menjadi terminal, dengan efek suara dengung + kilau. (Versi sebelumnya berupa blob telur yang mengembang dari kecil; diganti sesuai contoh situs Adam.) Hanya `transform` dan `opacity` yang dianimasikan; versi `border-radius` sempat membuat tugas 0,9 detik di HP.
 - **Volume:** semua suara di situs 35% (`SITE_VOLUME` di `components/guide/soundPref.ts`).
 - **Mochi melompat** antar kursi dalam lintasan melengkung (jongkok, melayang, mendarat "penyet"), dengan bunyi mendarat. Di HP, lompatan kecil di pojok.
 - **Latar:** gelombang logam halus dari shader `Warp` (`components/layout/MetalWaves.tsx`), transparan dan memudar ke bawah, menyala setelah intro ditutup. Cadangan CSS untuk tanpa WebGL / reduced motion.
 - **Struktur tidak linear:** angka raksasa bergaris di belakang tiap judul; About editorial asimetris (kalimat pembuka besar + daftar angka bertitik); Projects berupa grid bento dengan kartu unggulan bernomor; Skills berupa pita berjalan per kelompok; Contact berupa "Let's talk." raksasa.
-- **Lighthouse terakhir:** HP 89 / 100 / 100 / 100, desktop 100 / 100 / 100 / 100.
+- **Lighthouse terakhir:** HP 92 / 100 / 100 / 100, desktop 100 / 100 / 100 / 100.
