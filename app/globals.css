@@ -56,40 +56,39 @@ body {
   box-decoration-break: clone;
 }
 
-/* Pita skill berjalan (components/sections/Skills.tsx) */
+/* Huruf "Let's talk." (components/sections/TalkTitle.tsx): gradien logam
+   ditambah sorot cahaya putih di posisi kursor (--lx/--ly, diatur skrip). */
+.metal-text.spot-text {
+  background-image:
+    radial-gradient(circle at var(--lx, -200%) var(--ly, -200%), rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 55%),
+    linear-gradient(180deg, var(--metal-1) 0%, #d4d8de 38%, #9aa0a9 62%, #c3c8cf 78%, var(--metal-2) 100%);
+}
+
+/* Pita skill berjalan (components/sections/SkillsMarquee.tsx) */
 .marquee-mask {
   -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
   mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
 }
+/* gerakannya diatur Motion di components/sections/SkillsMarquee.tsx */
 .marquee-track {
   display: flex;
   width: max-content;
-  animation: marquee 32s linear infinite;
-}
-.marquee-reverse {
-  animation-direction: reverse;
-}
-.marquee-track:hover {
-  animation-play-state: paused;
+  will-change: transform;
 }
 .marquee-group {
   display: flex;
   gap: 0.75rem;
   padding-right: 0.75rem;
 }
-@keyframes marquee {
-  to { transform: translateX(-50%); }
-}
 @media (prefers-reduced-motion: reduce) {
   .marquee-track {
-    animation: none;
     width: auto;
   }
   .marquee-group {
     flex-wrap: wrap;
   }
   .marquee-group[aria-hidden="true"],
-  .marquee-group li[aria-hidden="true"] {
+  .marquee-group > li[aria-hidden="true"] {
     display: none;
   }
   .marquee-mask {

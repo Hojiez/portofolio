@@ -1,10 +1,10 @@
 import { SITE, SOCIALS } from "@/content/site";
 import { GuideSeat } from "@/components/guide/GuideSeat";
 import { Icon, ICON } from "@/components/ui/Icon";
-import { MetalText } from "@/components/ui/MetalText";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { CopyEmail } from "./CopyEmail";
+import { TalkTitle } from "./TalkTitle";
 import { FOCUS, PANEL } from "@/components/ui/styles";
 
 /* Penutup: "Let's talk." raksasa bergaya logam, lalu email dan sosial media
@@ -22,12 +22,11 @@ export function Contact() {
       />
 
       <Reveal>
-        <MetalText
-          as="p"
+        {/* huruf-hurufnya bereaksi ke kursor */}
+        <TalkTitle
+          text="Let's talk."
           className="relative pb-3 text-[clamp(3.75rem,14vw,10.5rem)] font-semibold leading-[0.9] tracking-[-0.04em]"
-        >
-          Let&apos;s talk.
-        </MetalText>
+        />
       </Reveal>
 
       <Reveal step={1}>
