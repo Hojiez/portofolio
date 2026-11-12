@@ -6,6 +6,8 @@ import { Reveal } from "@/components/ui/Reveal";
 import { ScrollLitText } from "@/components/ui/ScrollLitText";
 import { CountUp } from "@/components/ui/CountUp";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { CertViewer } from "./CertViewer";
+import { CodingStory } from "./CodingStory";
 
 /* About bergaya editorial: kalimat pembuka besar dan bio di kiri; foto dan
    angka sebagai daftar bertitik di kolom kanan yang lebih sempit. */
@@ -37,20 +39,28 @@ export function About() {
               <Portrait />
             </div>
           </Reveal>
-          {/* angka sorotan: label kiri, nilai kanan, dihubungkan garis titik */}
-          <dl className="mt-10 space-y-4">
+          {/* angka sorotan: label kiri, nilai kanan, dihubungkan garis titik.
+              "Years coding" dan "English (certified)" bisa dibuka (cerita
+              singkat dan sertifikat); sisanya baris biasa. */}
+          <div className="mt-10 space-y-4">
             {ABOUT.stats.map((s, i) => (
               <Reveal key={s.label} step={3 + i}>
-                <div className="flex items-baseline gap-3">
-                  <dt className="text-sm text-muted">{s.label}</dt>
-                  <span aria-hidden="true" className="flex-1 translate-y-[-3px] border-b border-dotted border-white/15" />
-                  <MetalText as="dd" className="font-[family-name:var(--font-mono)] text-lg font-semibold">
-                    <CountUp value={s.value} />
-                  </MetalText>
-                </div>
+                {i === 0 ? (
+                  <CodingStory label={s.label} value={s.value} />
+                ) : s.value === "C1" ? (
+                  <CertViewer label={s.label} value={s.value} />
+                ) : (
+                  <dl className="flex items-baseline gap-3">
+                    <dt className="text-sm text-muted">{s.label}</dt>
+                    <span aria-hidden="true" className="flex-1 translate-y-[-3px] border-b border-dotted border-white/15" />
+                    <MetalText as="dd" className="font-[family-name:var(--font-mono)] text-lg font-semibold">
+                      <CountUp value={s.value} />
+                    </MetalText>
+                  </dl>
+                )}
               </Reveal>
             ))}
-          </dl>
+          </div>
         </aside>
       </div>
     </section>

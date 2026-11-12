@@ -46,7 +46,7 @@ export const ABOUT = {
   headline: "I learned to code by writing game cheats. Now I build apps for shops that still keep their records on paper.",
   // >>> GANTI DENGAN DATA KAMU: bio — tiap string = satu paragraf
   bio: [
-    "I study Computer Science at BINUS University Malang. My first programs were game cheats. I wanted to know how games caught cheaters, so by junior high I was writing my own tools to find out.",
+    "I study Computer Science at BINUS University Malang. My first programs were cheats for the games I played as a kid. In high school I got curious about the other side, how games catch cheaters, and started digging into game security.",
     "I still like small tools that fix one annoying thing, like external helpers that make a game easier to play. I also like projects with a real person on the other end, such as moving a traditional shop's records into a proper database. Right now I'm studying operating systems and compiler construction. Cybersecurity is next.",
   ],
   // >>> GANTI DENGAN DATA KAMU: angka sorotan (maksimal 4 supaya rapi)

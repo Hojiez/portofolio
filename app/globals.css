@@ -239,6 +239,47 @@ body {
   padding-inline: max(1.5rem, calc((100vw - 72rem) / 2 + 1.5rem));
 }
 
+/* Penanda "story" di baris Years coding (components/sections/CodingStory.tsx):
+   berdenyut halus supaya pengunjung tahu baris itu bisa dibuka. Animasi
+   ceritanya sendiri memakai library Motion. */
+.story-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.05rem 0.45rem 0.1rem 0.35rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-fg);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02));
+  animation: story-chip-pulse 2.4s ease-in-out infinite;
+}
+.story-chip.is-open {
+  animation: none;
+}
+/* garis waktu di titik bab yang aktif; saat animasinya selesai, adegan
+   berikutnya muncul (CodingStory.tsx). Kursor di atas animasi = jeda. */
+.story-timer {
+  animation-name: story-timer;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+.story-timer.is-paused {
+  animation-play-state: paused;
+}
+.story-timer.is-last {
+  animation: none;
+}
+@keyframes story-timer {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@keyframes story-chip-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); border-color: rgba(255, 255, 255, 0.18); }
+  50% { box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.45); }
+}
+
 /* Tombol magnet (components/ui/Magnetic.tsx): kembali ke tempatnya dengan
    pantulan kecil saat dilepas; selama ditarik, mengikuti kursor lebih cepat. */
 [data-magnetic] {
@@ -715,6 +756,8 @@ html[data-intro="show"] .intro-overlay[data-phase="intro"] .intro-window {
   .metal-frame::after {
     transition: none;
   }
+  .story-chip,
+  .story-timer,
   .toast-in,
   .palette-in,
   .palette-fade,
