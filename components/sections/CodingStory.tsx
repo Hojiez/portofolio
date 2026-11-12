@@ -21,10 +21,15 @@ import { spring, StatRow } from "./StatRow";
  */
 
 const SCENES = [
-  { tag: "kid", caption: "I started with game cheats. I wanted god mode, so I wrote it myself." },
+  {
+    tag: "kid",
+    caption:
+      "I started with game cheats. I wanted god mode, so I wrote it myself.",
+  },
   {
     tag: "high school",
-    caption: "In high school I got curious about the other side: how anti-cheat catches people like me.",
+    caption:
+      "In high school I got curious about the other side: how anti-cheat catches people like me.",
   },
   {
     tag: "university",
@@ -44,7 +49,13 @@ const WHITE = "#f2f2f2";
 // posisi karakter (dari atas, %) tiap adegan
 const AVATAR_TOP = ["44%", "28%", "16%"];
 
-export function CodingStory({ label, value }: { label: string; value: string }) {
+export function CodingStory({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
   const [open, setOpen] = useState(false);
   const [scene, setScene] = useState(0);
   const [run, setRun] = useState(0); // naik tiap putar ulang, supaya animasi mulai dari awal
@@ -66,131 +77,158 @@ export function CodingStory({ label, value }: { label: string; value: string }) 
           setOpen((o) => !o);
           goTo(0);
         }}
-        panelLabel="How I got into coding"
+        title="How I got into coding"
       >
-        <div
-          className="relative overflow-hidden rounded-xl border border-white/10"
-          style={{ background: INK }}
-          onPointerEnter={() => setPaused(true)}
-          onPointerLeave={() => setPaused(false)}
-        >
-          {/* adegan baru masuk dari kanan, adegan lama keluar ke kiri */}
-          <AnimatePresence mode="popLayout" initial={false}>
-            <motion.div
-              key={`${scene}-${run}`}
-              initial={{ opacity: 0, x: 40, filter: "blur(6px)" }}
-              animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-              exit={{ opacity: 0, x: -40, filter: "blur(6px)" }}
-              transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
-            >
-              <Scene index={scene} />
-            </motion.div>
-          </AnimatePresence>
-
-          {/* karakter: foto Rauh dalam lingkaran putih; melompat ke posisi
-              barunya tiap adegan, lalu melayang pelan */}
-          <motion.div
-            aria-hidden="true"
-            className="absolute left-[4%] flex w-[15%] flex-col items-center gap-1"
-            initial={false}
-            animate={{ top: AVATAR_TOP[scene] }}
-            transition={spring}
+        {/* layar lebar: animasi di kiri, cerita dan kontrol di kanan */}
+        <div className="grid items-center gap-6 md:grid-cols-5">
+          <div
+            className="relative overflow-hidden rounded-xl border border-white/10 md:col-span-3"
+            style={{ background: INK }}
+            onPointerEnter={() => setPaused(true)}
+            onPointerLeave={() => setPaused(false)}
           >
-            <motion.div
-              key={`hop-${scene}-${run}`}
-              className="relative w-full"
-              initial={{ y: 0, scaleX: 1, scaleY: 1 }}
-              animate={{ y: [0, -14, 0, 0], scaleX: [1, 0.92, 1.12, 1], scaleY: [1, 1.08, 0.88, 1] }}
-              transition={{ duration: 0.6, times: [0, 0.4, 0.75, 1], ease: "easeOut" }}
-            >
-              {/* cincin yang berdenyut pelan */}
-              <motion.span
-                className="absolute inset-0 rounded-full"
-                style={{ boxShadow: `0 0 0 1px ${WHITE}` }}
-                animate={{ scale: [1, 1.25], opacity: [0.5, 0] }}
-                transition={{ duration: 1.8, repeat: Infinity, ease: "easeOut" }}
-              />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/avatar.jpg"
-                alt=""
-                width={48}
-                height={48}
-                className="relative aspect-square w-full rounded-full object-cover grayscale"
-                style={{ boxShadow: `0 0 0 1.5px ${WHITE}, 0 8px 20px -6px #000` }}
-              />
-            </motion.div>
-            <AnimatePresence mode="wait">
-              <motion.span
-                key={scene}
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                className="whitespace-nowrap font-[family-name:var(--font-mono)] text-[9px] text-muted"
+            {/* adegan baru masuk dari kanan, adegan lama keluar ke kiri */}
+            <AnimatePresence mode="popLayout" initial={false}>
+              <motion.div
+                key={`${scene}-${run}`}
+                initial={{ opacity: 0, x: 40, filter: "blur(6px)" }}
+                animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+                exit={{ opacity: 0, x: -40, filter: "blur(6px)" }}
+                transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
               >
-                {SCENES[scene].tag}
-              </motion.span>
+                <Scene index={scene} />
+              </motion.div>
             </AnimatePresence>
-          </motion.div>
 
-          {paused && scene < SCENES.length - 1 && (
-            <span className="absolute right-2 top-2 font-[family-name:var(--font-mono)] text-[9px] text-muted">
-              paused
-            </span>
-          )}
-        </div>
-
-        <AnimatePresence mode="wait">
-          <motion.p
-            key={`c-${scene}-${run}`}
-            aria-live="polite"
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.3 }}
-            className="mt-3 min-h-[2.5rem] text-sm leading-relaxed text-fg/85"
-          >
-            {SCENES[scene].caption}
-          </motion.p>
-        </AnimatePresence>
-
-        <div className="mt-2 flex items-center justify-between">
-          {/* titik bab: yang aktif berisi garis waktu; saat garis penuh,
-              adegan berikutnya muncul */}
-          <div className="flex items-center gap-1.5" role="group" aria-label="Story chapters">
-            {SCENES.map((s, i) => (
-              <motion.button
-                key={s.tag}
-                type="button"
-                onClick={() => goTo(i)}
-                aria-label={`Chapter ${i + 1}: ${s.tag}`}
-                aria-current={i === scene ? "step" : undefined}
-                animate={{ width: i === scene ? 28 : 6 }}
-                transition={spring}
-                className={`relative h-1.5 overflow-hidden rounded-full bg-white/25 hover:bg-white/45 ${FOCUS}`}
+            {/* karakter: foto Rauh dalam lingkaran putih; melompat ke posisi
+              barunya tiap adegan, lalu melayang pelan */}
+            <motion.div
+              aria-hidden="true"
+              className="absolute left-[4%] flex w-[15%] flex-col items-center gap-1"
+              initial={false}
+              animate={{ top: AVATAR_TOP[scene] }}
+              transition={spring}
+            >
+              <motion.div
+                key={`hop-${scene}-${run}`}
+                className="relative w-full"
+                initial={{ y: 0, scaleX: 1, scaleY: 1 }}
+                animate={{
+                  y: [0, -14, 0, 0],
+                  scaleX: [1, 0.92, 1.12, 1],
+                  scaleY: [1, 1.08, 0.88, 1],
+                }}
+                transition={{
+                  duration: 0.6,
+                  times: [0, 0.4, 0.75, 1],
+                  ease: "easeOut",
+                }}
               >
-                {i === scene && (
-                  <span
-                    key={`${scene}-${run}`}
-                    className={`story-timer absolute inset-0 origin-left rounded-full bg-fg ${
-                      scene === SCENES.length - 1 ? "is-last" : ""
-                    } ${paused ? "is-paused" : ""}`}
-                    style={{ animationDuration: `${SCENE_MS}ms` }}
-                    onAnimationEnd={() => {
-                      if (scene < SCENES.length - 1) goTo(scene + 1);
-                    }}
-                  />
-                )}
-              </motion.button>
-            ))}
+                {/* cincin yang berdenyut pelan */}
+                <motion.span
+                  className="absolute inset-0 rounded-full"
+                  style={{ boxShadow: `0 0 0 1px ${WHITE}` }}
+                  animate={{ scale: [1, 1.25], opacity: [0.5, 0] }}
+                  transition={{
+                    duration: 1.8,
+                    repeat: Infinity,
+                    ease: "easeOut",
+                  }}
+                />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/avatar.jpg"
+                  alt=""
+                  width={48}
+                  height={48}
+                  className="relative aspect-square w-full rounded-full object-cover grayscale"
+                  style={{
+                    boxShadow: `0 0 0 1.5px ${WHITE}, 0 8px 20px -6px #000`,
+                  }}
+                />
+              </motion.div>
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={scene}
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  className="whitespace-nowrap font-[family-name:var(--font-mono)] text-[9px] text-muted"
+                >
+                  {SCENES[scene].tag}
+                </motion.span>
+              </AnimatePresence>
+            </motion.div>
+
+            {paused && scene < SCENES.length - 1 && (
+              <span className="absolute right-2 top-2 font-[family-name:var(--font-mono)] text-[9px] text-muted">
+                paused
+              </span>
+            )}
           </div>
-          <button
-            type="button"
-            onClick={() => goTo(0)}
-            className={`rounded font-[family-name:var(--font-mono)] text-[11px] text-muted hover:text-fg ${FOCUS}`}
-          >
-            replay ↺
-          </button>
+
+          <div className="md:col-span-2">
+            <p className="font-[family-name:var(--font-mono)] text-[11px] text-muted">
+              {String(scene + 1).padStart(2, "0")} /{" "}
+              {String(SCENES.length).padStart(2, "0")} · {SCENES[scene].tag}
+            </p>
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={`c-${scene}-${run}`}
+                aria-live="polite"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.3 }}
+                className="mt-2 min-h-[4.5rem] text-lg leading-snug text-fg/90"
+              >
+                {SCENES[scene].caption}
+              </motion.p>
+            </AnimatePresence>
+
+            <div className="mt-4 flex items-center justify-between">
+              {/* titik bab: yang aktif berisi garis waktu; saat garis penuh,
+              adegan berikutnya muncul */}
+              <div
+                className="flex items-center gap-1.5"
+                role="group"
+                aria-label="Story chapters"
+              >
+                {SCENES.map((s, i) => (
+                  <motion.button
+                    key={s.tag}
+                    type="button"
+                    onClick={() => goTo(i)}
+                    aria-label={`Chapter ${i + 1}: ${s.tag}`}
+                    aria-current={i === scene ? "step" : undefined}
+                    animate={{ width: i === scene ? 28 : 6 }}
+                    transition={spring}
+                    className={`relative h-1.5 overflow-hidden rounded-full bg-white/25 hover:bg-white/45 ${FOCUS}`}
+                  >
+                    {i === scene && (
+                      <span
+                        key={`${scene}-${run}`}
+                        className={`story-timer absolute inset-0 origin-left rounded-full bg-fg ${
+                          scene === SCENES.length - 1 ? "is-last" : ""
+                        } ${paused ? "is-paused" : ""}`}
+                        style={{ animationDuration: `${SCENE_MS}ms` }}
+                        onAnimationEnd={() => {
+                          if (scene < SCENES.length - 1) goTo(scene + 1);
+                        }}
+                      />
+                    )}
+                  </motion.button>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => goTo(0)}
+                className={`rounded font-[family-name:var(--font-mono)] text-[11px] text-muted hover:text-fg ${FOCUS}`}
+              >
+                replay ↺
+              </button>
+            </div>
+          </div>
         </div>
       </StatRow>
     </MotionConfig>
@@ -241,7 +279,12 @@ function Typed({
           fill={WHITE}
           initial={{ opacity: 0 }}
           animate={{ opacity: [0, 1, 1, 0] }}
-          transition={{ delay: delay + 0.03 * children.length, duration: 0.9, repeat: Infinity, times: [0, 0.01, 0.5, 0.51] }}
+          transition={{
+            delay: delay + 0.03 * children.length,
+            duration: 0.9,
+            repeat: Infinity,
+            times: [0, 0.01, 0.5, 0.51],
+          }}
         />
       )}
     </g>
@@ -252,7 +295,16 @@ function Typed({
 function Monitor({ children }: { children: React.ReactNode }) {
   return (
     <g>
-      <rect x="62" y="12" width="206" height="126" rx="10" fill="none" stroke={WHITE} strokeWidth="2" />
+      <rect
+        x="62"
+        y="12"
+        width="206"
+        height="126"
+        rx="10"
+        fill="none"
+        stroke={WHITE}
+        strokeWidth="2"
+      />
       <rect x="67" y="17" width="196" height="116" rx="7" fill={PANEL} />
       <rect x="156" y="139" width="18" height="9" fill={MID} />
       <rect x="132" y="148" width="66" height="4" rx="2" fill={WHITE} />
@@ -281,7 +333,11 @@ function Flash({ at }: { at: number }) {
 
 function Scene({ index }: { index: number }) {
   return (
-    <svg viewBox="0 0 280 170" className="block h-auto w-full" aria-hidden="true">
+    <svg
+      viewBox="0 0 280 170"
+      className="block h-auto w-full"
+      aria-hidden="true"
+    >
       {index === 0 && <SceneCheats />}
       {index === 1 && <SceneAntiCheat />}
       {index === 2 && <SceneProjects />}
@@ -302,7 +358,14 @@ function SceneCheats() {
       <motion.g
         initial={{ opacity: 0, y: 0 }}
         animate={{ opacity: 1, y: [0, 0, -12, 0, -6, 0] }}
-        transition={{ opacity: { delay: 0.1 }, y: { delay: 2.0, duration: 0.8, times: [0, 0.01, 0.3, 0.55, 0.75, 1] } }}
+        transition={{
+          opacity: { delay: 0.1 },
+          y: {
+            delay: 2.0,
+            duration: 0.8,
+            times: [0, 0.01, 0.3, 0.55, 0.75, 1],
+          },
+        }}
       >
         <rect x="200" y="62" width="14" height="14" fill={WHITE} />
         <rect x="203" y="66" width="3" height="3" fill={INK} />
@@ -312,7 +375,9 @@ function SceneCheats() {
         <rect x="209" y="92" width="5" height="8" fill={LINE} />
       </motion.g>
       {/* bar HP */}
-      <text x="78" y="34" fill={MID} style={mono}>HP</text>
+      <text x="78" y="34" fill={MID} style={mono}>
+        HP
+      </text>
       <rect x="94" y="27.5" width="110" height="7" rx="3.5" fill={LINE} />
       <motion.rect
         x="94"
@@ -348,8 +413,12 @@ function SceneCheats() {
       >
         9999
       </motion.text>
-      <Typed x={78} y={104} delay={0.3}>{"> inject cheat.dll"}</Typed>
-      <Typed x={78} y={118} delay={0.95} fill={MID} caret>{"> player.hp = 9999"}</Typed>
+      <Typed x={78} y={104} delay={0.3}>
+        {"> inject cheat.dll"}
+      </Typed>
+      <Typed x={78} y={118} delay={0.95} fill={MID} caret>
+        {"> player.hp = 9999"}
+      </Typed>
       <Flash at={2.05} />
     </Monitor>
   );
@@ -362,7 +431,11 @@ function SceneAntiCheat() {
     <motion.g
       initial={{ x: 0 }}
       animate={{ x: [0, 0, -4, 4, -3, 3, 0] }}
-      transition={{ delay: 2.1, duration: 0.4, times: [0, 0.01, 0.2, 0.4, 0.6, 0.8, 1] }}
+      transition={{
+        delay: 2.1,
+        duration: 0.4,
+        times: [0, 0.01, 0.2, 0.4, 0.6, 0.8, 1],
+      }}
     >
       <Monitor>
         <motion.g
@@ -371,8 +444,14 @@ function SceneAntiCheat() {
           transition={{ delay: 0.15, ...spring }}
           style={{ transformOrigin: "165px 62px" }}
         >
-          <path d="M165 32 L190 41 V62 C190 77 179 87 165 93 C151 87 140 77 140 62 V41 Z" fill={WHITE} />
-          <path d="M165 40 L183 47 V62 C183 73 175 80 165 85 C155 80 147 73 147 62 V47 Z" fill={PANEL} />
+          <path
+            d="M165 32 L190 41 V62 C190 77 179 87 165 93 C151 87 140 77 140 62 V41 Z"
+            fill={WHITE}
+          />
+          <path
+            d="M165 40 L183 47 V62 C183 73 175 80 165 85 C155 80 147 73 147 62 V47 Z"
+            fill={PANEL}
+          />
           <motion.path
             d="M156 62 L163 69 L175 55"
             fill="none"
@@ -396,7 +475,9 @@ function SceneAntiCheat() {
           animate={{ y: [20, 128, 20] }}
           transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
         />
-        <Typed x={78} y={110} delay={0.5} fill={MID}>{"anti-cheat: scanning memory..."}</Typed>
+        <Typed x={78} y={110} delay={0.5} fill={MID}>
+          {"anti-cheat: scanning memory..."}
+        </Typed>
         <motion.text
           x="78"
           y="124"
@@ -414,8 +495,24 @@ function SceneAntiCheat() {
           animate={{ x: [110, 185, 150, 215], y: [60, 72, 95, 112] }}
           transition={{ duration: 2.1, ease: "easeInOut" }}
         >
-          <circle cx="0" cy="0" r="11" fill={PANEL} fillOpacity="0.4" stroke={WHITE} strokeWidth="3" />
-          <rect x="7" y="7" width="12" height="4" rx="2" transform="rotate(45 7 7)" fill={WHITE} />
+          <circle
+            cx="0"
+            cy="0"
+            r="11"
+            fill={PANEL}
+            fillOpacity="0.4"
+            stroke={WHITE}
+            strokeWidth="3"
+          />
+          <rect
+            x="7"
+            y="7"
+            width="12"
+            height="4"
+            rx="2"
+            transform="rotate(45 7 7)"
+            fill={WHITE}
+          />
         </motion.g>
         <Flash at={2.1} />
       </Monitor>
@@ -428,7 +525,9 @@ function SceneAntiCheat() {
 function SceneProjects() {
   // empat project berbeda: nama tanpa keterangan versi, tiap nama sekali saja
   // (Furniture Store punya tiga versi)
-  const titles = [...new Set(PROJECTS.map((p) => p.title.replace(/ \(.*\)$/, "")))].slice(0, 4);
+  const titles = [
+    ...new Set(PROJECTS.map((p) => p.title.replace(/ \(.*\)$/, ""))),
+  ].slice(0, 4);
   return (
     <g>
       {titles.map((t, i) => {
@@ -440,10 +539,32 @@ function SceneProjects() {
             key={t}
             initial={{ opacity: 0, y: -24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: land, type: "spring", stiffness: 380, damping: 18 }}
+            transition={{
+              delay: land,
+              type: "spring",
+              stiffness: 380,
+              damping: 18,
+            }}
           >
-            <rect x={x} y={y} width="168" height="26" rx="6" fill={PANEL} stroke={i === 0 ? WHITE : LINE} />
-            <text x={x + 12} y={y + 16.5} fill={WHITE} style={{ fontFamily: "var(--font-inter)", fontSize: 9.5, fontWeight: 600 }}>
+            <rect
+              x={x}
+              y={y}
+              width="168"
+              height="26"
+              rx="6"
+              fill={PANEL}
+              stroke={i === 0 ? WHITE : LINE}
+            />
+            <text
+              x={x + 12}
+              y={y + 16.5}
+              fill={WHITE}
+              style={{
+                fontFamily: "var(--font-inter)",
+                fontSize: 9.5,
+                fontWeight: 600,
+              }}
+            >
               {t}
             </text>
             {/* centang "selesai" */}

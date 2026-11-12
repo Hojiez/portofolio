@@ -114,7 +114,8 @@ export function MetalCursor() {
     <div
       ref={ref}
       aria-hidden="true"
-      className="metal-cursor pointer-events-none fixed left-0 top-0 z-[95]"
+      // di atas semua lapisan, termasuk layar intro (z-100) dan command palette
+      className="metal-cursor pointer-events-none fixed left-0 top-0 z-[200]"
       style={{ width: C, height: C, opacity: 0, transform: "translate3d(-999px, -999px, 0)" }}
     >
       <MetalShader className="h-full w-full" scale={BALL} speed={0.8} />

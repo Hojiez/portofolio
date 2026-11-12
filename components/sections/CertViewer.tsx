@@ -26,7 +26,7 @@ const CERT = {
 /* Tingkat zoom: seluruh halaman terlihat (lebar dihitung dari tinggi area
    tampil 340px dikurangi padding, dibagi rasio kertas A4), selebar area,
    lalu hampir dua kali lebar area untuk membaca detail. */
-const VIEW_H = 340;
+const VIEW_H = 480;
 const ZOOMS = [`calc((${VIEW_H}px - 1.5rem) / 1.4142)`, "100%", "180%"];
 
 function ToolButton({
@@ -85,9 +85,9 @@ export function CertViewer({ label, value }: { label: string; value: string }) {
           setPage(0);
           setZoom(0);
         }}
-        panelLabel="EnglishScore certificate"
+        title="EnglishScore certificate"
       >
-        <div className="overflow-hidden rounded-xl border border-white/10 bg-ink">
+        <div className="mx-auto max-w-3xl overflow-hidden rounded-xl border border-white/10 bg-ink">
           {/* toolbar */}
           <div className="flex items-center gap-1 border-b border-white/10 px-2 py-1.5">
             <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" className="ml-1 shrink-0 text-muted" {...icon}>

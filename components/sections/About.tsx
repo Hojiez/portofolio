@@ -8,6 +8,7 @@ import { CountUp } from "@/components/ui/CountUp";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { CertViewer } from "./CertViewer";
 import { CodingStory } from "./CodingStory";
+import { ABOUT_DRAWER_ID } from "./StatRow";
 
 /* About bergaya editorial: kalimat pembuka besar dan bio di kiri; foto dan
    angka sebagai daftar bertitik di kolom kanan yang lebih sempit. */
@@ -63,6 +64,10 @@ export function About() {
           </div>
         </aside>
       </div>
+
+      {/* tempat panel yang dibuka dari baris angka di atas (cerita dan
+          sertifikat), selebar section; diisi lewat portal oleh StatRow.tsx */}
+      <div id={ABOUT_DRAWER_ID} className="mt-12 space-y-10 empty:mt-0" />
     </section>
   );
 }
