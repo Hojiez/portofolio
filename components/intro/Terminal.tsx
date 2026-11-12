@@ -2,9 +2,13 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { PROJECTS, SITE } from "@/content/site";
+import { wordsOf } from "@/content/script";
+import { setLine } from "@/components/guide/guideStore";
+import { Mascot } from "@/components/guide/Mascot";
 import { setSoundOn, useSoundOn } from "@/components/guide/soundPref";
 import { FOCUS } from "@/components/ui/styles";
 import { introShouldShow, markIntroSeen } from "./introState";
+import { sfxCheck, sfxEnter, sfxKey, sfxReady, sfxToggleOn, unlockAudio } from "./sfx";
 
 /*
  * Intro terminal (docs/MASTER_PLAN.md bagian 4).
@@ -31,25 +35,61 @@ type Progress = {
   answered: boolean; // "(y) y" sudah dijawab
   checks: number; // jumlah baris centang yang sudah tampil
   spinning: boolean; // baris centang terakhir masih memuat
+  mochi: boolean; // Mochi sudah muncul di terminal
+  words: number; // jumlah kata sapaan Mochi yang sudah tampil
   ready: boolean; // baris "press ENTER" sudah tampil
 };
 
-const START: Progress = { cmd: 0, install: false, answered: false, checks: 0, spinning: false, ready: false };
-const DONE: Progress = { cmd: CMD.length, install: true, answered: true, checks: CHECKS.length, spinning: false, ready: true };
+// Sapaan Mochi di terminal = kalimat kursi "intro" di content/script.ts
+const INTRO_WORDS = wordsOf("intro");
 
-/* Urutan langkah beserta jedanya (ms). Total sekitar 4,3 detik:
-   400 + 15×45 + 300 + 450 + 5×(220+220) + 300. */
-function buildSchedule(): [number, (p: Progress) => Progress][] {
-  const steps: [number, (p: Progress) => Progress][] = [];
+const START: Progress = {
+  cmd: 0,
+  install: false,
+  answered: false,
+  checks: 0,
+  spinning: false,
+  mochi: false,
+  words: 0,
+  ready: false,
+};
+const DONE: Progress = {
+  cmd: CMD.length,
+  install: true,
+  answered: true,
+  checks: CHECKS.length,
+  spinning: false,
+  mochi: true,
+  words: INTRO_WORDS.length,
+  ready: true,
+};
+
+/* Satu langkah: jeda (ms), perubahan tampilan, dan efek suara (opsional). */
+type Step = [number, (p: Progress) => Progress, (() => void)?];
+
+/* Urutan langkah beserta jedanya. Total sekitar 5,5 detik: ketikan dan
+   instalasi ±3,9 detik, lalu Mochi muncul dan menyapa ±1,6 detik. */
+function buildSchedule(): Step[] {
+  const steps: Step[] = [];
   steps.push([400, (p) => p]);
-  for (let i = 1; i <= CMD.length; i++) steps.push([45, (p) => ({ ...p, cmd: i })]);
-  steps.push([300, (p) => ({ ...p, install: true })]);
-  steps.push([450, (p) => ({ ...p, answered: true })]);
+  for (let i = 1; i <= CMD.length; i++) {
+    // spasi tidak berbunyi, supaya ritmenya terdengar seperti mengetik sungguhan
+    const sound = CMD[i - 1] === " " ? undefined : sfxKey;
+    steps.push([45, (p) => ({ ...p, cmd: i }), sound]);
+  }
+  steps.push([300, (p) => ({ ...p, install: true }), sfxKey]); // tekan Enter
+  steps.push([450, (p) => ({ ...p, answered: true }), sfxKey]); // ketik "y"
   CHECKS.forEach((_, i) => {
-    steps.push([220, (p) => ({ ...p, checks: i + 1, spinning: true })]);
-    steps.push([220, (p) => ({ ...p, spinning: false })]);
+    steps.push([180, (p) => ({ ...p, checks: i + 1, spinning: true })]);
+    steps.push([180, (p) => ({ ...p, spinning: false }), () => sfxCheck(i)]);
   });
-  steps.push([300, (p) => ({ ...p, ready: true })]);
+  // Mochi muncul lalu menyapa kata demi kata
+  steps.push([300, (p) => ({ ...p, mochi: true })]);
+  INTRO_WORDS.forEach((w, i) => {
+    const prev = INTRO_WORDS[i - 1] ?? "";
+    steps.push([i === 0 ? 350 : /[.,!?]$/.test(prev) ? 260 : 90, (p) => ({ ...p, words: i + 1 })]);
+  });
+  steps.push([250, (p) => ({ ...p, ready: true }), sfxReady]);
   return steps;
 }
 
@@ -64,10 +104,17 @@ export function Terminal() {
   const soundOn = useSoundOn();
   const enterRef = useRef<HTMLButtonElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
+  // Mochi di terminal dilepas setelah intro selesai memudar, supaya tidak
+  // terus memakai WebGL di belakang layar.
+  const [released, setReleased] = useState(false);
 
   const close = useCallback(() => {
     if (document.documentElement.getAttribute("data-intro") !== "show") return;
+    sfxEnter();
+    // sapaan intro dihitung sudah diucapkan (satu kalimat per kursi)
+    setLine("intro", { shown: INTRO_WORDS.length, done: true });
     markIntroSeen();
+    window.setTimeout(() => setReleased(true), 700);
     // pindahkan fokus keyboard ke awal halaman
     document.getElementById("top")?.focus({ preventScroll: true });
   }, []);
@@ -86,7 +133,11 @@ export function Terminal() {
     overlayRef.current?.focus({ preventScroll: true });
 
     if (reducedMotion()) {
-      const id = window.setTimeout(() => setP(DONE), 0);
+      // teks langsung utuh; cukup satu bunyi "siap", tanpa rentetan bunyi tuts
+      const id = window.setTimeout(() => {
+        sfxReady();
+        setP(DONE);
+      }, 0);
       return () => window.clearTimeout(id);
     }
 
@@ -95,14 +146,25 @@ export function Terminal() {
     let timer: number;
     const run = () => {
       if (i >= steps.length) return;
-      const [wait, apply] = steps[i++];
+      const [wait, apply, sound] = steps[i++];
       timer = window.setTimeout(() => {
+        sound?.();
         setP(apply);
         run();
       }, wait);
     };
     run();
     return () => window.clearTimeout(timer);
+  }, []);
+
+  // Interaksi pertama pengunjung (klik, tap, tombol) membuka izin suara browser.
+  useEffect(() => {
+    window.addEventListener("pointerdown", unlockAudio);
+    window.addEventListener("keydown", unlockAudio);
+    return () => {
+      window.removeEventListener("pointerdown", unlockAudio);
+      window.removeEventListener("keydown", unlockAudio);
+    };
   }, []);
 
   // Enter menutup intro (kecuali saat fokus di tombol lain: tombol itu yang menangani).
@@ -192,6 +254,28 @@ export function Terminal() {
               </ul>
             )}
 
+            {/* Mochi muncul dan menyapa */}
+            {p.mochi && (
+              <div className="intro-mochi mt-4 flex items-center gap-3">
+                <div className="h-[56px] w-[56px] shrink-0">
+                  {!released && (
+                    <Mascot
+                      size={56}
+                      expression={p.words < INTRO_WORDS.length ? "talk" : "happy"}
+                      look={{ x: 0.7, y: 0.05 }}
+                    />
+                  )}
+                </div>
+                <p className="font-[family-name:var(--font-inter)] text-[15px] leading-snug text-fg/90">
+                  {INTRO_WORDS.map((w, i) => (
+                    <span key={i} className={`guide-word ${i < p.words ? "is-on" : ""}`}>
+                      {w}{" "}
+                    </span>
+                  ))}
+                </p>
+              </div>
+            )}
+
             {p.ready && (
               <p className="mt-4">
                 <button
@@ -228,7 +312,14 @@ export function Terminal() {
               key={String(on)}
               type="button"
               aria-pressed={soundOn === on}
-              onClick={() => setSoundOn(on)}
+              onClick={(e) => {
+                setSoundOn(on);
+                if (on) sfxToggleOn();
+                // Diklik dengan mouse/tap (bukan keyboard): kembalikan fokus ke
+                // terminal, supaya Enter berikutnya melanjutkan intro, bukan
+                // menekan tombol ini lagi.
+                if (e.detail > 0) (enterRef.current ?? overlayRef.current)?.focus({ preventScroll: true });
+              }}
               className={`rounded-full px-3 py-1.5 ${FOCUS} ${
                 soundOn === on ? "metal-button font-semibold" : "text-muted hover:text-fg"
               }`}

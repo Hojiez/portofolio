@@ -1,4 +1,5 @@
 import { SITE } from "@/content/site";
+import { GuideSeat } from "@/components/guide/GuideSeat";
 import { Icon, ICON } from "@/components/ui/Icon";
 import { MetalShader } from "@/components/ui/MetalShader";
 import { MetalText } from "@/components/ui/MetalText";
@@ -68,6 +69,8 @@ export function Hero() {
             </a>
           </div>
         </Reveal>
+
+        <GuideSeat id="hero" className="mt-10" />
       </div>
     </section>
   );

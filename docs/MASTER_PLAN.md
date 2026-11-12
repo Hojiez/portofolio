@@ -141,7 +141,9 @@ Aturan:
 - Teks kalimat selalu tampil, baik suara aktif maupun mati.
 - Balon teks memakai `aria-live="polite"` supaya terbaca oleh pembaca layar.
 
-**Naskah disimpan di satu file data** (`content/script.ts`), terpisah dari kode animasi, dengan bentuk: kursi, teks, ekspresi, file suara.
+**Naskah disimpan di satu file data** (`content/script.ts`), terpisah dari kode animasi, dengan bentuk: kursi, teks, ekspresi, file suara. Kolom ekspresi = ekspresi Mochi setelah selesai bicara; selama bicara selalu `talk`.
+
+**Implementasi (Fase 4):** satu Mochi untuk seluruh halaman (`components/guide/Guide.tsx`). Di layar lebar Mochi terbang ke kotak kursi (`GuideSeat`) dan melirik ke kalimatnya; di HP (<768px) Mochi menempel di pojok kanan bawah. Kalimat selalu berada di alur section, jadi tidak menutupi isi. Kursi aktif setelah berada di tengah layar ±0,45 detik; di bagian paling atas, hero dipilih jika tidak ada kursi lain. Kalimat yang terpotong karena pindah kursi langsung tampil utuh. Untuk pembaca layar, kalimat diumumkan utuh sekaligus lewat wilayah `aria-live` tersembunyi, bukan kata demi kata.
 
 **Draf naskah (Inggris, sudut pandang maskot, boleh diubah bebas):**
 
@@ -149,7 +151,7 @@ Aturan:
 |---|---|---|
 | `intro` | "Oh, a visitor! I'm Mochi. Press Enter and I'll show you around." | `happy` |
 | `hero` | "That's Rauh. Everyone calls him Hessed. He made me, so I have to say nice things." | `smug` |
-| `about` | "This is where he talks about himself. I'd skim it, but I'm a blob of liquid metal." | `talk` |
+| `about` | "This is where he talks about himself. I'd skim it, but I'm a blob of liquid metal." | `happy` |
 | `projects` | "Seven things he built. One of them is three furniture stores in a trench coat." | `smug` |
 | `skills` | "The tools he uses. I can't use any of them. No thumbs." | `curious` |
 | `contact` | "That's the tour. If you liked it, email him. If you didn't, it was my fault." | `happy` |

@@ -1,4 +1,5 @@
 import { ABOUT } from "@/content/site";
+import { GuideSeat } from "@/components/guide/GuideSeat";
 import { MetalText } from "@/components/ui/MetalText";
 import { Portrait } from "@/components/ui/Portrait";
 import { Reveal } from "@/components/ui/Reveal";
@@ -9,6 +10,7 @@ export function About() {
   return (
     <section id="about" className="mx-auto max-w-5xl scroll-mt-28 px-6 py-20 sm:py-28">
       <SectionHeading index="01" title="About" />
+      <GuideSeat id="about" className="mb-10" />
 
       <div className="grid gap-10 md:grid-cols-[280px_1fr] md:gap-14">
         <Reveal>

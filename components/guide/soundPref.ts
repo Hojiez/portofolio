@@ -19,6 +19,11 @@ function read(): boolean {
   }
 }
 
+/** Baca pilihan suara di luar komponen React (misalnya pemutar efek suara). */
+export function isSoundOn() {
+  return typeof window !== "undefined" && read();
+}
+
 export function setSoundOn(on: boolean) {
   try {
     localStorage.setItem(KEY, on ? "on" : "off");

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CATEGORIES, PROJECTS, type Category } from "@/content/site";
+import { GuideSeat } from "@/components/guide/GuideSeat";
 import { Icon, ICON } from "@/components/ui/Icon";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -17,6 +18,7 @@ export function Projects() {
   return (
     <section id="projects" className="mx-auto max-w-5xl scroll-mt-28 px-6 py-20 sm:py-28">
       <SectionHeading index="02" title="Projects" />
+      <GuideSeat id="projects" className="mb-10" />
 
       {/* filter kategori */}
       <Reveal>

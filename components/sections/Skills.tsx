@@ -1,4 +1,5 @@
 import { SKILLS } from "@/content/site";
+import { GuideSeat } from "@/components/guide/GuideSeat";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { PANEL } from "@/components/ui/styles";
@@ -7,6 +8,7 @@ export function Skills() {
   return (
     <section id="skills" className="mx-auto max-w-5xl scroll-mt-28 px-6 py-20 sm:py-28">
       <SectionHeading index="03" title="Skills" />
+      <GuideSeat id="skills" className="mb-10" />
 
       <div className="grid gap-5 sm:grid-cols-2">
         {SKILLS.map((g, i) => (

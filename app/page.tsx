@@ -3,6 +3,7 @@
  * Isi situs (nama, project, skill) ada di content/site.ts.
  */
 
+import { Guide } from "@/components/guide/Guide";
 import { Terminal } from "@/components/intro/Terminal";
 import { INTRO_SCRIPT } from "@/components/intro/introState";
 import { Background } from "@/components/layout/Background";
@@ -28,6 +29,8 @@ export default function Page() {
       >
         <Background />
         <Navbar />
+        {/* Mochi melayang di atas isi halaman, dari kursi ke kursi */}
+        <Guide />
 
         <main id="top" tabIndex={-1} className="relative z-10 outline-none">
           <Hero />

@@ -1,4 +1,5 @@
 import { SITE, SOCIALS } from "@/content/site";
+import { GuideSeat } from "@/components/guide/GuideSeat";
 import { Icon, ICON } from "@/components/ui/Icon";
 import { MetalText } from "@/components/ui/MetalText";
 import { Reveal } from "@/components/ui/Reveal";
@@ -9,6 +10,7 @@ export function Contact() {
   return (
     <section id="contact" className="mx-auto max-w-5xl scroll-mt-28 px-6 py-20 sm:py-28">
       <SectionHeading index="04" title="Contact" />
+      <GuideSeat id="contact" className="mb-10" />
 
       <Reveal>
         <div className={`relative overflow-hidden rounded-3xl p-8 sm:p-14 ${PANEL}`}>

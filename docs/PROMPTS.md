@@ -113,6 +113,8 @@ Selesai jika: keenam ekspresi bisa dibedakan dengan jelas di ukuran 64px dan
 Baca docs/MASTER_PLAN.md bagian 6, dan panduan Next.js yang relevan di
 node_modules sebelum menulis kode.
 
+(Sudah dikerjakan. Ringkasan cara kerjanya ada di docs/MASTER_PLAN.md bagian 6.)
+
 Tugas: hubungkan Mochi dengan section halaman.
 - Buat content/script.ts berisi naskah dari tabel di bagian 6: kursi, teks,
   ekspresi, dan nama file suara (file suaranya belum ada, isi namanya saja).
