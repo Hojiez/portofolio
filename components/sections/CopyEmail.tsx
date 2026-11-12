@@ -10,6 +10,7 @@ export function CopyEmail() {
   const [done, setDone] = useState(false);
   return (
     <button
+      data-magnetic
       type="button"
       onClick={async () => {
         if (!(await copyEmail())) return;

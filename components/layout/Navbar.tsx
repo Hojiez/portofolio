@@ -127,6 +127,7 @@ export function Navbar() {
             {SITE.cvUrl && (
               <li>
                 <a
+                  data-magnetic
                   href={SITE.cvUrl}
                   download
                   className={`inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition ${METAL_BUTTON} ${FOCUS}`}

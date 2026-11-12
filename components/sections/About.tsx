@@ -3,6 +3,8 @@ import { GuideSeat } from "@/components/guide/GuideSeat";
 import { MetalText } from "@/components/ui/MetalText";
 import { Portrait } from "@/components/ui/Portrait";
 import { Reveal } from "@/components/ui/Reveal";
+import { ScrollLitText } from "@/components/ui/ScrollLitText";
+import { CountUp } from "@/components/ui/CountUp";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
 /* About bergaya editorial: kalimat pembuka besar dan bio di kiri; foto dan
@@ -15,14 +17,11 @@ export function About() {
 
       <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
         <div className="lg:col-span-8">
-          <Reveal>
-            <MetalText
-              as="p"
-              className="text-balance text-3xl font-semibold leading-[1.15] tracking-tight sm:text-4xl"
-            >
-              {ABOUT.headline}
-            </MetalText>
-          </Reveal>
+          {/* kalimat pembuka menyala kata demi kata saat di-scroll */}
+          <ScrollLitText
+            text={ABOUT.headline}
+            className="text-balance text-3xl font-semibold leading-[1.15] tracking-tight sm:text-4xl"
+          />
           <Reveal step={1}>
             <div className="mt-8 space-y-5 text-lg leading-relaxed text-fg/80 lg:pl-12">
               {ABOUT.bio.map((p, i) => (
@@ -46,7 +45,7 @@ export function About() {
                   <dt className="text-sm text-muted">{s.label}</dt>
                   <span aria-hidden="true" className="flex-1 translate-y-[-3px] border-b border-dotted border-white/15" />
                   <MetalText as="dd" className="font-[family-name:var(--font-mono)] text-lg font-semibold">
-                    {s.value}
+                    <CountUp value={s.value} />
                   </MetalText>
                 </div>
               </Reveal>

@@ -195,6 +195,69 @@ body {
   to { opacity: 1; }
 }
 
+/* Projects: scroll horizontal yang terkunci (components/sections/Projects.tsx).
+   Hanya aktif saat skripnya memasang data-pinned (layar lebar, tanpa
+   prefers-reduced-motion); selain itu daftar tetap grid bento biasa.
+   Bagian yang menempel dibuat selebar layar penuh, dan deretan kartu diberi
+   jarak kiri yang sejajar dengan isi halaman (lebar maks 72rem = max-w-6xl). */
+.pin-meta {
+  display: none;
+}
+.pin-outer[data-pinned] > .pin-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 5rem; /* ruang untuk navbar */
+}
+.pin-outer[data-pinned] .pin-track {
+  display: flex;
+  align-items: stretch;
+  gap: 1.5rem;
+  width: max-content;
+  padding-inline: max(1.5rem, calc((100vw - 72rem) / 2 + 1.5rem));
+  will-change: transform;
+}
+.pin-outer[data-pinned] .pin-track > li {
+  flex: none;
+  width: 400px;
+  max-height: calc(100vh - 10rem);
+}
+.pin-outer[data-pinned] .pin-track > li:first-child {
+  width: 560px;
+}
+.pin-outer[data-pinned] .pin-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.75rem;
+  padding-inline: max(1.5rem, calc((100vw - 72rem) / 2 + 1.5rem));
+}
+
+/* Tombol magnet (components/ui/Magnetic.tsx): kembali ke tempatnya dengan
+   pantulan kecil saat dilepas; selama ditarik, mengikuti kursor lebih cepat. */
+[data-magnetic] {
+  transition:
+    translate 450ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease,
+    filter 150ms ease;
+}
+[data-magnetic].is-magnet {
+  transition:
+    translate 120ms ease-out,
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease,
+    filter 150ms ease;
+}
+
 /* Bola logam yang menjadi scroll bar (components/layout/MetalOrb.tsx). Muncul
    memudar setelah posisinya pertama kali dihitung. */
 .metal-orb {

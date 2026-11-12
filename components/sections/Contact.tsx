@@ -49,6 +49,7 @@ export function Contact() {
             {SOCIALS.map((s) => (
               <li key={s.label}>
                 <a
+                  data-magnetic
                   href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"

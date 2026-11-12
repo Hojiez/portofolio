@@ -56,6 +56,7 @@ export function Hero() {
         <Reveal step={4}>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <a
+              data-magnetic
               href="#projects"
               className={`inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 font-medium transition ${METAL_BUTTON} ${FOCUS}`}
             >
@@ -64,6 +65,7 @@ export function Hero() {
             </a>
             {/* Tombol kedua: unduh CV jika ada, selain itu ajakan menghubungi */}
             <a
+              data-magnetic
               href={SITE.cvUrl || "#contact"}
               download={SITE.cvUrl ? true : undefined}
               className={`inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 font-medium text-fg transition-colors hover:bg-white/10 ${PANEL} ${FOCUS}`}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CATEGORIES, PROJECTS, type Category, type Project } from "@/content/site";
 import { GuideSeat } from "@/components/guide/GuideSeat";
 import { Icon, ICON } from "@/components/ui/Icon";
@@ -118,11 +118,91 @@ function ProjectCard({ p, index, featured }: { p: Project; index: number; featur
   );
 }
 
+/*
+ * Scroll horizontal yang "terkunci": tinggi pembungkus luar = tinggi layar +
+ * jeda awal + panjang geseran deretan + jeda akhir. Selama pembungkus itu
+ * lewat, bagian dalamnya menempel (sticky) di layar dan deretan kartu digeser
+ * ke kiri sebanding dengan posisi scroll, dengan jeda diam di kedua ujung.
+ * Semua diatur langsung lewat style (tanpa state React).
+ */
+function useHorizontalPin(count: number) {
+  const pinRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLUListElement>(null);
+  const countRef = useRef<HTMLSpanElement>(null);
+  const barRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    const pin = pinRef.current;
+    const track = trackRef.current;
+    if (!pin || !track) return;
+    const mq = window.matchMedia("(min-width: 1024px) and (prefers-reduced-motion: no-preference)");
+    let distance = 0;
+    let holdStart = 0; // jarak scroll (px) sebelum deretan mulai bergeser
+    let holdEnd = 0; // jarak scroll (px) setelah kartu terakhir, sebelum halaman lanjut
+    let frame = 0;
+
+    const update = () => {
+      frame = 0;
+      if (!pin.dataset.pinned) return;
+      const rect = pin.getBoundingClientRect();
+      // posisi geser: 0 selama jeda awal, 0–1 selama bergeser, 1 selama jeda akhir
+      const scrolled = -rect.top - holdStart;
+      const p = distance > 0 ? Math.max(0, Math.min(1, scrolled / distance)) : 0;
+      track.style.transform = `translate3d(${-p * distance}px, 0, 0)`;
+      if (barRef.current) barRef.current.style.transform = `scaleX(${p})`;
+      if (countRef.current) {
+        const n = Math.min(count, Math.floor(p * (count - 1) + 0.5) + 1);
+        countRef.current.textContent = `${String(n).padStart(2, "0")} / ${String(count).padStart(2, "0")}`;
+      }
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+
+    // hitung ulang panjang geseran (ukuran layar berubah, filter berganti)
+    const measure = () => {
+      if (!mq.matches) {
+        delete pin.dataset.pinned;
+        pin.style.height = "";
+        track.style.transform = "";
+        return;
+      }
+      pin.dataset.pinned = "true";
+      distance = Math.max(0, track.scrollWidth - window.innerWidth);
+      // Jeda di kedua ujung: deretan berhenti sebentar di kartu pertama dan
+      // terakhir, jadi scroll yang kebablasan tidak langsung melompat keluar
+      // dari section (dan masuk ke section tidak langsung menggeser kartu).
+      const vh = window.innerHeight;
+      holdStart = vh * 0.2;
+      holdEnd = vh * 0.45;
+      pin.style.height = `${vh + holdStart + distance + holdEnd}px`;
+      update();
+    };
+
+    const ro = new ResizeObserver(measure);
+    ro.observe(track);
+    mq.addEventListener("change", measure);
+    window.addEventListener("resize", measure);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    measure();
+    return () => {
+      cancelAnimationFrame(frame);
+      ro.disconnect();
+      mq.removeEventListener("change", measure);
+      window.removeEventListener("resize", measure);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [count]);
+
+  return { pinRef, trackRef, countRef, barRef };
+}
+
 export function Projects() {
   const [filter, setFilter] = useState<Category>("All");
 
   const visibleProjects =
     filter === "All" ? PROJECTS : PROJECTS.filter((p) => p.category === filter);
+  const { pinRef, trackRef, countRef, barRef } = useHorizontalPin(visibleProjects.length);
 
   return (
     <section id="projects" className="mx-auto max-w-6xl scroll-mt-28 px-6 py-24 sm:py-32">
@@ -157,15 +237,31 @@ export function Projects() {
         </Reveal>
       </div>
 
-      <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-6">
-        {visibleProjects.map((p, i) => (
-          <li key={p.title} className={spanFor(i, visibleProjects.length)}>
-            <Reveal step={i} className="h-full">
-              <ProjectCard p={p} index={PROJECTS.indexOf(p)} featured={i === 0 && visibleProjects.length > 2} />
-            </Reveal>
-          </li>
-        ))}
-      </ul>
+      {/* Di layar lebar: section "terkunci" di layar dan scroll ke bawah
+          menggeser deretan kartu ke samping (useHorizontalPin). Di HP/tablet
+          dan dengan prefers-reduced-motion: grid bento biasa. */}
+      <div ref={pinRef} className="pin-outer relative">
+        <div className="pin-sticky">
+          <ul ref={trackRef} className="pin-track grid gap-5 sm:grid-cols-2 lg:grid-cols-6">
+            {visibleProjects.map((p, i) => (
+              <li key={p.title} className={spanFor(i, visibleProjects.length)}>
+                <Reveal step={Math.min(i, 3)} className="h-full">
+                  <ProjectCard p={p} index={PROJECTS.indexOf(p)} featured={i === 0 && visibleProjects.length > 2} />
+                </Reveal>
+              </li>
+            ))}
+          </ul>
+          {/* penunjuk posisi deretan: nomor kartu dan garis progres */}
+          <div aria-hidden="true" className="pin-meta">
+            <span ref={countRef} className="font-[family-name:var(--font-mono)] text-xs text-muted">
+              01 / {String(visibleProjects.length).padStart(2, "0")}
+            </span>
+            <span className="relative h-px w-40 overflow-hidden bg-white/10">
+              <span ref={barRef} className="absolute inset-0 origin-left bg-white/60" style={{ transform: "scaleX(0)" }} />
+            </span>
+          </div>
+        </div>
+      </div>
 
       {visibleProjects.length === 0 && (
         <p className={`rounded-2xl p-8 text-center text-muted ${PANEL}`}>Nothing in this category yet.</p>

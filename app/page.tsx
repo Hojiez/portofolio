@@ -18,6 +18,7 @@ import { Projects } from "@/components/sections/Projects";
 import { Skills } from "@/components/sections/Skills";
 import { CommandPalette } from "@/components/command/CommandPalette";
 import { InlineScript } from "@/components/ui/InlineScript";
+import { Magnetic } from "@/components/ui/Magnetic";
 import { Toaster } from "@/components/ui/Toaster";
 
 export default function Page() {
@@ -55,6 +56,8 @@ export default function Page() {
       {/* kursor logam (hanya perangkat bermouse); di luar #page supaya juga
           tampil di atas intro */}
       <MetalCursor />
+      {/* tombol bertanda data-magnetic tertarik ke kursor */}
+      <Magnetic />
     </>
   );
 }
