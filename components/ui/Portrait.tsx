@@ -4,7 +4,8 @@ import { useState } from "react";
 import { SITE } from "@/content/site";
 import { PANEL } from "./styles";
 
-/* Foto profil dengan fallback inisial */
+/* Foto profil (hitam-putih berbutir, sudah diolah di public/profile.jpg)
+   dalam bingkai krom, dengan fallback inisial. */
 export function Portrait() {
   const [failed, setFailed] = useState(false);
   const initials = SITE.name
@@ -15,8 +16,9 @@ export function Portrait() {
     .join("");
 
   return (
+    <div className="metal-frame w-full max-w-[280px] rounded-[26px]">
     <div
-      className={`relative aspect-square w-full max-w-[280px] overflow-hidden rounded-3xl ${PANEL}`}
+      className={`metal-frame-inner aspect-square w-full overflow-hidden rounded-[20px] ${PANEL}`}
     >
       {SITE.photo && !failed ? (
         // eslint-disable-next-line @next/next/no-img-element
@@ -31,6 +33,7 @@ export function Portrait() {
           <span className="metal-text text-6xl font-semibold">{initials}</span>
         </div>
       )}
+    </div>
     </div>
   );
 }

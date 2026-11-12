@@ -1,0 +1,167 @@
+<!doctype html>
+<!--
+  CV Rauh Risqi Abdillah. Sumber dari public/Rauh-Risqi-Abdillah-CV.pdf.
+  Cara membuat ulang PDF: buka file ini di Chrome, Ctrl+P, pilih
+  "Save as PDF", ukuran kertas Letter, margin "None", centang
+  "Background graphics". (Atau minta Claude menjalankan ulang ekspornya.)
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Rauh Risqi Abdillah - CV</title>
+<style>
+  @page { size: Letter; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    width: 8.5in; padding: 0.4in 0.6in 0.3in;
+    font-family: Arial, "Liberation Sans", Helvetica, sans-serif;
+    font-size: 9.4pt; line-height: 1.24; color: #111;
+  }
+  a { color: #1a56db; }
+  header { position: relative; text-align: center; padding: 0 1.05in; min-height: 1.0in; }
+  header img {
+    position: absolute; right: 0; top: -0.04in; width: 0.86in; height: 1.0in;
+    object-fit: cover; object-position: center 20%; border-radius: 3px;
+  }
+  h1 { font-size: 15.5pt; letter-spacing: 0.17em; font-weight: 700; color: #1f2430; }
+  .contact { color: #555; margin-top: 3pt; font-size: 9.4pt; }
+  .contact span + span::before { content: "|"; margin: 0 0.5em; color: #888; }
+  hr { border: 0; border-top: 1px solid #c8c8c8; margin: 6.5pt 0 5.5pt; }
+  .summary { text-align: left; }
+  h2 {
+    font-size: 11pt; letter-spacing: 0.3em; font-weight: 700; color: #1f2430;
+    margin-bottom: 4pt;
+  }
+  .item { margin-bottom: 4pt; }
+  .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12pt; }
+  .title { font-weight: 700; color: #1f2430; font-size: 10pt; }
+  .title .ctx { font-weight: 400; font-style: italic; color: #555; font-size: 9.2pt; }
+  .title .ctx::before { content: "\2014"; margin: 0 0.45em; font-style: normal; color: #777; }
+  .date { color: #555; white-space: nowrap; font-size: 9.2pt; }
+  .sub { font-style: italic; color: #555; font-size: 9.2pt; }
+  ul { padding-left: 1.6em; }
+  li { margin: 0.6pt 0; }
+  .skills p { margin: 0.6pt 0; }
+  .langs { display: flex; align-items: baseline; gap: 14pt; }
+  .langs h2 { margin: 0; }
+  .muted { color: #666; }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="profile.jpg" alt="">
+  <h1>RAUH RISQI ABDILLAH</h1>
+  <p class="contact"><span>Balikpapan, Indonesia</span><span>rauhrisqiabdil@gmail.com</span></p>
+  <p class="contact">
+    <span><a href="https://portofolio-gbos.vercel.app">portofolio-gbos.vercel.app</a></span><span><a href="https://github.com/Hojiez">github.com/Hojiez</a></span>
+  </p>
+  <p class="contact"><a href="https://www.linkedin.com/in/rauh-abdillah-5ab331326/">linkedin.com/in/rauh-abdillah-5ab331326</a></p>
+</header>
+
+<hr>
+<p class="summary">
+  Computer Science student at BINUS University Malang who builds full-stack web apps and small desktop tools.
+  I have worked on eight projects in JavaScript/TypeScript, Go, Java, and Python, including an online furniture store
+  with role-based access, Midtrans payments, and a Gemini-powered sales dashboard. I got into programming through
+  game security, and I'm currently studying operating systems and compiler construction, with cybersecurity next.
+</p>
+
+<hr>
+<h2>PROJECTS</h2>
+
+<div class="item">
+  <div class="row"><p class="title">Interactive Portfolio<span class="ctx">Personal project</span></p><p class="date">November 2026</p></div>
+  <p class="sub">Next.js 16, React 19, TypeScript, Tailwind CSS, WebGL shaders, Web Audio API, Vercel</p>
+  <ul>
+    <li>Built a portfolio with an animated mascot guide that moves between sections and reacts to clicks and idle time</li>
+    <li>Loaded WebGL shaders only when visible and idle, and cut the shader bundle from 266 KB to 37 KB</li>
+  </ul>
+</div>
+
+<div class="item">
+  <div class="row"><p class="title">Furniture Store v2<span class="ctx">Full-stack web app</span></p><p class="date">June 2026 &ndash; July 2026</p></div>
+  <p class="sub">Node.js, Express, PostgreSQL, JWT, Midtrans, Google Gemini API, Vercel</p>
+  <ul>
+    <li>Built a store with three JWT roles (admin, cashier, customer), product and customer management, orders, and reviews</li>
+    <li>Integrated Midtrans payments, and added an admin dashboard with revenue trends and Gemini-generated sales insights</li>
+  </ul>
+</div>
+
+<div class="item">
+  <div class="row"><p class="title">Toko Sumber Makmur POS<span class="ctx">Team project, BINUS University</span></p><p class="date">February 2026 &ndash; July 2026</p></div>
+  <p class="sub">Vue 3, Laravel 11, SQLite</p>
+  <ul>
+    <li>Worked in a team building a point-of-sale system for a neighborhood grocery store in Malang</li>
+    <li>Visited the store in person to see how the owner handles sales and stock before the system was built</li>
+  </ul>
+</div>
+
+<div class="item">
+  <div class="row"><p class="title">Furniture Store v1 and Go Rewrite<span class="ctx">Backend</span></p><p class="date">April 2026 &ndash; May 2026</p></div>
+  <p class="sub">Node.js, Express, PostgreSQL, Go, Gin, MySQL</p>
+  <ul>
+    <li>Wrote a REST API for products, login, search, and checkout; checkout runs in a database transaction so stock updates roll back on failure</li>
+    <li>Rewrote the backend in Go with Gin and MySQL, including sales stats, revenue trend, and top-selling endpoints</li>
+  </ul>
+</div>
+
+<div class="item">
+  <div class="row"><p class="title">NeuroMotion<span class="ctx">Stroke rehabilitation web app</span></p><p class="date">January 2026</p></div>
+  <p class="sub">Java, Spring Boot, Thymeleaf, MySQL</p>
+  <ul>
+    <li>Built patient registration, login, and profiles, plus exercise tracking with history and feedback after each session</li>
+    <li>Added an SOS alert page and an admin panel that resets weekly progress</li>
+  </ul>
+</div>
+
+<div class="item">
+  <div class="row"><p class="title">Fish Watcher<span class="ctx">Desktop tool</span></p><p class="date">June 2026</p></div>
+  <p class="sub">Python, Playwright, CustomTkinter</p>
+  <ul>
+    <li>Built a desktop app that watches a Discord channel with Playwright, joins the matching Roblox server, and sends a desktop notification</li>
+  </ul>
+</div>
+
+<div class="item">
+  <div class="row"><p class="title">Expo Mobile App<span class="ctx">Mobile development coursework</span></p><p class="date">May 2026</p></div>
+  <p class="sub">React Native, Expo Router, TypeScript</p>
+  <ul>
+    <li>Built a tab-based React Native app, then exported it to the web and deployed it at <a href="https://tugas-expo.vercel.app">tugas-expo.vercel.app</a></li>
+  </ul>
+</div>
+
+<hr>
+<h2>EDUCATION</h2>
+<div class="item">
+  <div class="row"><p class="title">Bachelor of Computer Science</p><p class="date">Present</p></div>
+  <p class="sub">BINUS University Malang</p>
+  <ul>
+    <li>Relevant coursework: Operating Systems, Compilation Techniques, Mobile Application Development</li>
+  </ul>
+</div>
+
+<hr>
+<h2>TECHNICAL SKILLS</h2>
+<div class="skills">
+  <p><b>Languages:</b> TypeScript, JavaScript, Python, Go, Java, SQL</p>
+  <p><b>Web &amp; Mobile:</b> React, Next.js, React Native (Expo), Tailwind CSS, HTML/CSS</p>
+  <p><b>Backend &amp; Data:</b> Node.js, Express, Gin, Spring Boot, PostgreSQL, MySQL, REST APIs, JWT</p>
+  <p><b>Tools:</b> Git, Vercel, Playwright, Midtrans, Gemini API</p>
+</div>
+
+<hr>
+<h2>CERTIFICATIONS</h2>
+<ul>
+  <li>English Proficiency, C1 (Advanced)</li>
+</ul>
+
+<hr>
+<div class="langs">
+  <h2>LANGUAGES</h2>
+  <p><b>English</b> <span class="muted">(C1, Advanced)</span> &nbsp;|&nbsp; <b>Bahasa Indonesia</b> <span class="muted">(Native)</span></p>
+</div>
+
+</body>
+</html>

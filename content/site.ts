@@ -24,10 +24,11 @@ export const SITE = {
   email: "rauhrisqiabdil@gmail.com",
   // >>> GANTI DENGAN DATA KAMU: file CV — taruh PDF-nya di folder /public lalu
   //     isi "/cv.pdf". Selama kosong "", tombol CV disembunyikan.
-  cvUrl: "",
+  //     (sumbernya docs/cv/cv.html)
+  cvUrl: "/Rauh-Risqi-Abdillah-CV.pdf",
   // >>> GANTI DENGAN DATA KAMU: foto — taruh di folder /public lalu isi
   //     "/profile.jpg". Selama kosong "", tampil kotak berisi inisial nama.
-  photo: "",
+  photo: "/profile.jpg",
   // >>> GANTI DENGAN DATA KAMU: alamat situs setelah online, misalnya
   //     "https://rauh.vercel.app". Kosongkan "" kalau belum ada.
   url: "",
@@ -88,6 +89,14 @@ export const PROJECTS: Project[] = [
     tech: ["Node.js", "Express", "PostgreSQL", "JWT", "Midtrans", "Gemini API"],
     liveUrl: "https://app-database-new.vercel.app",
     repoUrl: "https://github.com/Hojiez/app-database-new",
+  },
+  {
+    title: "Toko Sumber Makmur POS",
+    description:
+      "A point-of-sale system for a neighborhood grocery store, built as a BINUS team project. I went to the shop in person to see how the owner handles sales and stock.",
+    category: "Web",
+    tech: ["Vue 3", "Laravel 11", "SQLite"],
+    // tidak ada repo publik atau demo: proyek untuk toko sungguhan
   },
   {
     title: "Furniture Store (Go)",
