@@ -44,14 +44,18 @@ export function MetalShader({
   scale = 0.75,
   speed = 0.6,
   look = "orb",
+  cssOnly = false,
 }: {
   className?: string;
   scale?: number;
   speed?: number;
   look?: keyof typeof LOOKS;
+  /** Pakai cakram logam CSS saja, tanpa shader (lebih ringan). */
+  cssOnly?: boolean;
 }) {
   const boxRef = useRef<HTMLDivElement>(null);
-  const { ready } = useShaderGate(boxRef);
+  const gate = useShaderGate(boxRef);
+  const ready = gate.ready && !cssOnly;
 
   return (
     <div ref={boxRef} aria-hidden="true" className={`relative ${className}`}>

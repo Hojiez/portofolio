@@ -191,6 +191,7 @@ export function Mascot({
   size = 160,
   look,
   className = "",
+  lite = false,
 }: {
   expression?: MascotExpression;
   size?: number;
@@ -199,6 +200,8 @@ export function Mascot({
    *  melirik sendiri saat idle. */
   look?: MascotLook;
   className?: string;
+  /** Badan dari logam CSS saja, tanpa shader (misalnya di loading screen). */
+  lite?: boolean;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const bounceRef = useRef<HTMLDivElement>(null);
@@ -281,7 +284,7 @@ export function Mascot({
         >
           {/* badan: bola logam dipipihkan jadi oval */}
           <div className="mochi-body absolute inset-0" style={{ transform: "scaleY(0.88)" }}>
-            <MetalShader className="h-full w-full" scale={0.96} speed={0.4} look="soft" />
+            <MetalShader className="h-full w-full" scale={0.96} speed={0.4} look="soft" cssOnly={lite} />
           </div>
 
           {/* wajah: dipotong mengikuti bentuk oval badan */}

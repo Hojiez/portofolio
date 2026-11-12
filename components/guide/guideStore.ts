@@ -35,6 +35,23 @@ function subscribe(l: () => void) {
   };
 }
 
+/* Kursi yang sedang ditempati Mochi. Balon teks hanya tampil di kursi ini;
+   saat Mochi pindah, balon di kursi lama hilang. */
+let activeSeat: SeatId | null = null;
+
+export function setActiveSeat(id: SeatId | null) {
+  activeSeat = id;
+  listeners.forEach((l) => l());
+}
+
+export function useIsActiveSeat(id: SeatId) {
+  return useSyncExternalStore(
+    subscribe,
+    () => activeSeat === id,
+    () => false
+  );
+}
+
 /** Kalimat satu kursi; komponen hanya digambar ulang saat kursinya berubah. */
 export function useSeatLine(id: SeatId) {
   return useSyncExternalStore(

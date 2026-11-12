@@ -6,7 +6,7 @@ import { INTRO_DONE_EVENT } from "@/components/intro/introState";
 import { sfxBoing, sfxLand } from "@/components/intro/sfx";
 import { FOCUS } from "@/components/ui/styles";
 import type { MascotExpression } from "./expressions";
-import { getLine, setLine } from "./guideStore";
+import { getLine, setActiveSeat, setLine } from "./guideStore";
 import { Mascot, type MascotLook } from "./Mascot";
 import { playVoice, stopVoice, useStopVoiceWhenMuted, wordTimings } from "./useVoice";
 
@@ -225,6 +225,7 @@ export function Guide() {
       }
       speaking.current = false;
       active.current = id;
+      setActiveSeat(id); // balon teks di kursi lama hilang, di kursi baru boleh tampil
 
       // kemunculan pertama langsung di kursi; selanjutnya melompat
       const first = prev === null;

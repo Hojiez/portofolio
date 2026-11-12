@@ -1,11 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { PROJECTS, SITE } from "@/content/site";
 import { SCRIPT, wordsOf } from "@/content/script";
 import { playVoice, stopVoice, wordTimings } from "@/components/guide/useVoice";
 import { setLine } from "@/components/guide/guideStore";
-import { Mascot } from "@/components/guide/Mascot";
+import { Mascot, type MascotLook } from "@/components/guide/Mascot";
+import { useCanAnimateShader } from "@/components/ui/useShaderGate";
+import dynamic from "next/dynamic";
+import { preloadIntroAssets } from "./preload";
 import { setSoundOn, useSoundOn } from "@/components/guide/soundPref";
 import { FOCUS } from "@/components/ui/styles";
 import { introShouldShow, markIntroSeen } from "./introState";
@@ -104,6 +107,17 @@ function greetingTimes(duration: number | null) {
 
 const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+// Shader logam cair untuk kotak pembuka (kodenya sudah dimuat saat loading).
+const LiquidMetal = dynamic(() => import("@/components/ui/LiquidMetalCanvas"), { ssr: false });
+
+const WIDE = "(min-width: 768px)";
+function subscribeWide(cb: () => void) {
+  const mq = window.matchMedia(WIDE);
+  mq.addEventListener("change", cb);
+  return () => mq.removeEventListener("change", cb);
+}
+const isWide = () => window.matchMedia(WIDE).matches;
+
 function Cursor() {
   return <span aria-hidden="true" className="intro-cursor ml-0.5 inline-block h-[1.1em] w-[0.55em] translate-y-[0.15em] bg-fg/80" />;
 }
@@ -116,6 +130,16 @@ export function Terminal() {
   // Mochi di terminal dilepas setelah intro selesai memudar, supaya tidak
   // terus memakai WebGL di belakang layar.
   const [released, setReleased] = useState(false);
+  // "loading": Mochi + cincin berputar sambil aset dimuat; "intro": kotak
+  // logam cair lalu terminal.
+  const [phase, setPhase] = useState<"loading" | "intro">("loading");
+  const [load, setLoad] = useState(0); // persen aset yang sudah dimuat
+  const [loaderLook, setLoaderLook] = useState<MascotLook>({ x: 0, y: 0 });
+  const [metalDone, setMetalDone] = useState(false); // shader kotak logam boleh dilepas
+  // Kotak logam memakai shader asli hanya di layar lebar. Di HP (kartu grafis
+  // umumnya lemah) dipakai versi CSS supaya intro tidak tersendat.
+  const wide = useSyncExternalStore(subscribeWide, isWide, () => false);
+  const liquid = useCanAnimateShader() && wide;
 
   const close = useCallback(() => {
     if (document.documentElement.getAttribute("data-intro") !== "show") return;
@@ -137,29 +161,17 @@ export function Terminal() {
     if (!d.hasAttribute("data-intro")) d.setAttribute("data-intro", introShouldShow() ? "show" : "seen");
   }, []);
 
-  // Jalankan efek ketik jika intro tampil.
+  // Urutan intro: loading screen (sambil memuat aset) -> kotak logam cair ->
+  // efek ketik di terminal.
   useEffect(() => {
     if (document.documentElement.getAttribute("data-intro") !== "show") return;
     overlayRef.current?.focus({ preventScroll: true });
 
-    if (reducedMotion()) {
-      // teks langsung utuh; cukup satu bunyi "siap", tanpa rentetan bunyi tuts
-      const id = window.setTimeout(() => {
-        sfxReady();
-        setP(DONE);
-      }, 0);
-      return () => window.clearTimeout(id);
-    }
-
-    // bunyi blob pembuka (hanya terdengar jika suara On dan browser sudah
-    // mengizinkan audio; lihat sfx.ts)
-    sfxBlob();
-
-    const steps = buildSchedule();
-    let i = 0;
     let cancelled = false;
     const pending: number[] = [];
     const later = (fn: () => void, ms: number) => pending.push(window.setTimeout(fn, ms));
+    const steps = buildSchedule();
+    let i = 0;
 
     // Sapaan Mochi: putar suaranya (jika suara aktif dan diizinkan browser),
     // munculkan kata-katanya mengikuti suara, lalu baris "press ENTER".
@@ -185,12 +197,47 @@ export function Terminal() {
         run();
       }, wait);
     };
-    run();
+
+    const startIntro = () => {
+      if (cancelled) return;
+      setPhase("intro");
+      if (reducedMotion()) {
+        // teks langsung utuh; cukup satu bunyi "siap", tanpa rentetan bunyi tuts
+        sfxReady();
+        setP(DONE);
+        return;
+      }
+      // bunyi kotak logam pembuka (hanya terdengar jika suara On dan browser
+      // sudah mengizinkan audio; lihat sfx.ts)
+      sfxBlob();
+      // lepas shader kotak logam setelah ia melebur jadi terminal
+      later(() => setMetalDone(true), 2600);
+      run();
+    };
+
+    // Loading screen: tampil minimal sebentar supaya animasi kotak -> lingkaran
+    // sempat terlihat, dan selesai saat semua aset siap.
+    const minShow = new Promise((r) => window.setTimeout(r, reducedMotion() ? 300 : 1600));
+    void Promise.all([preloadIntroAssets((d, t) => !cancelled && setLoad(Math.round((d / t) * 100))), minShow]).then(
+      startIntro
+    );
+
     return () => {
       cancelled = true;
       pending.forEach((t) => window.clearTimeout(t));
     };
   }, []);
+
+  // Loading screen: mata Mochi memutar mengikuti kilau cincin yang berputar.
+  useEffect(() => {
+    if (phase !== "loading" || reducedMotion()) return;
+    let angle = 0;
+    const id = window.setInterval(() => {
+      angle += Math.PI / 4;
+      setLoaderLook({ x: Math.cos(angle) * 0.7, y: Math.sin(angle) * 0.6 });
+    }, 260);
+    return () => window.clearInterval(id);
+  }, [phase]);
 
   // Interaksi pertama pengunjung (klik, tap, tombol) membuka izin suara browser.
   useEffect(() => {
@@ -226,6 +273,7 @@ export function Terminal() {
       aria-modal="true"
       aria-label="Intro"
       tabIndex={-1}
+      data-phase={phase}
       className="intro-overlay fixed inset-0 z-[100] flex flex-col bg-ink outline-none"
     >
       {/* kilau redup di belakang terminal */}
@@ -235,11 +283,57 @@ export function Terminal() {
         style={{ background: "radial-gradient(ellipse 60% 45% at 50% 45%, rgba(220,226,235,0.07), transparent 70%)" }}
       />
 
+      {/* Loading screen: Mochi dengan cincin logam yang berputar di sekelilingnya,
+          sambil suara dan aset dimuat */}
+      <div
+        role="status"
+        aria-label={`Loading ${load}%`}
+        className="intro-loader pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center gap-6"
+      >
+        <div className="relative flex h-40 w-40 items-center justify-center">
+          <div aria-hidden="true" className="loader-ring absolute inset-0 rounded-full" />
+          <div className="loader-bob">
+            {/* dilepas setelah loading memudar, supaya tidak memakai WebGL lagi */}
+            {!metalDone ? (
+              <Mascot size={96} expression="idle" look={loaderLook} lite />
+            ) : (
+              <span className="block h-24 w-24" />
+            )}
+          </div>
+        </div>
+        <p aria-hidden="true" className="font-[family-name:var(--font-mono)] text-xs tracking-[0.2em] text-muted">
+          LOADING {String(load).padStart(3, " ")}%
+        </p>
+      </div>
+
       <div className="relative flex flex-1 items-center justify-center px-4">
         <div className="relative w-full max-w-[640px]">
         {/* kotak logam cair pembuka seukuran jendela: bergoyang, lalu melebur
             menjadi jendela terminal di bawahnya */}
-        <div aria-hidden="true" className="intro-egg pointer-events-none absolute inset-0 z-10" />
+        <div aria-hidden="true" className="intro-egg pointer-events-none absolute inset-0 z-10">
+          {/* logam cair sungguhan (shader). Gradien CSS di belakangnya jadi
+              cadangan jika WebGL tidak ada atau gerak dikurangi. */}
+          {phase === "intro" && liquid && !metalDone && (
+            <div className="intro-liquid absolute inset-0">
+              <LiquidMetal
+                className="h-full w-full"
+                shape="none"
+                fit="cover"
+                scale={1}
+                colorBack="#aaaaac"
+                colorTint="#ffffff"
+                repetition={2}
+                softness={0.2}
+                shiftRed={0.3}
+                shiftBlue={0.3}
+                distortion={0.18}
+                contour={0.4}
+                angle={70}
+                speed={1.6}
+              />
+            </div>
+          )}
+        </div>
         <div className="intro-window relative w-full overflow-hidden rounded-2xl border border-line bg-surface/90 shadow-[0_40px_120px_-40px_rgba(0,0,0,0.9)]">
           {/* bilah judul jendela */}
           <div className="flex items-center gap-2 border-b border-line px-4 py-3">

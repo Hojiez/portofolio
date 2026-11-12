@@ -224,17 +224,57 @@ html[data-intro="show"] #page {
    Hanya transform dan opacity yang dianimasikan: keduanya dikerjakan kartu
    grafis tanpa menggambar ulang halaman. (Versi yang menganimasikan
    border-radius sempat membuat satu tugas 0,9 detik di HP.) */
-html[data-intro="show"] .intro-egg {
+/* Loading screen (sebelum kotak logam): Mochi + cincin logam berputar.
+   Kilau cincin memutar sekali tiap 2,08 detik, sama dengan putaran mata Mochi
+   di Terminal.tsx, jadi Mochi terlihat mengikuti kilaunya. */
+.intro-loader {
+  transition: opacity 450ms ease;
+}
+.intro-overlay[data-phase="intro"] .intro-loader {
+  opacity: 0;
+}
+.loader-ring {
+  background:
+    conic-gradient(from 0deg, transparent 0 58%, rgba(255, 255, 255, 0.95) 80%, rgba(143, 216, 255, 0.6) 86%, transparent 92%),
+    rgba(255, 255, 255, 0.07);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+  animation: loader-spin 2.08s linear infinite;
+}
+.loader-bob {
+  animation: loader-bob 1.4s ease-in-out infinite;
+}
+@keyframes loader-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes loader-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+/* selama loading, jendela terminal belum tampil */
+.intro-overlay[data-phase="loading"] .intro-window {
+  opacity: 0;
+}
+.intro-liquid {
+  animation: intro-liquid-in 0.45s ease both;
+}
+@keyframes intro-liquid-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* kotak logam dan terminal baru beranimasi setelah loading selesai */
+html[data-intro="show"] .intro-overlay[data-phase="intro"] .intro-egg {
   animation: intro-egg 2.3s cubic-bezier(0.37, 0, 0.3, 1) both;
   will-change: transform, opacity;
 }
-html[data-intro="show"] .intro-window {
+html[data-intro="show"] .intro-overlay[data-phase="intro"] .intro-window {
   animation: intro-window-in 2.3s ease both;
 }
 /* goyangan jeli: melebar-menyempit bergantian, makin lama makin tenang */
 @keyframes intro-egg {
   0% { transform: scale(0.94); opacity: 0; }
-  8% { transform: scale(1.03, 0.97); opacity: 1; }
+  14% { transform: scale(1.03, 0.97); opacity: 1; }
   20% { transform: scale(0.975, 1.03); }
   33% { transform: scale(1.02, 0.985); }
   46% { transform: scale(0.99, 1.012); }
@@ -342,6 +382,21 @@ html[data-intro="show"] .intro-window {
   opacity: 1;
   filter: none;
 }
+/* Balon teks Mochi: muncul saat Mochi bicara di kursi ini, memudar saat Mochi
+   pindah ke kursi lain. */
+.guide-bubble {
+  opacity: 0;
+  transform: translateY(6px) scale(0.98);
+  transform-origin: left center;
+  transition:
+    opacity 300ms ease,
+    transform 300ms ease;
+}
+.guide-bubble.is-shown {
+  opacity: 1;
+  transform: none;
+}
+
 /* Mochi (components/guide/Guide.tsx). Perpindahan antar kursi berupa lompatan
    yang dianimasikan dari JavaScript; di sini hanya muncul/hilangnya. */
 .guide-mochi {
@@ -424,7 +479,9 @@ html[data-intro="show"] .intro-window {
   .intro-cursor,
   .intro-spin,
   .intro-mochi,
-  html[data-intro="show"] .intro-window {
+  .loader-ring,
+  .loader-bob,
+  html[data-intro="show"] .intro-overlay[data-phase="intro"] .intro-window {
     animation: none;
   }
   .intro-egg {

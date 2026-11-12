@@ -37,8 +37,18 @@ function subscribeMotion(onChange: () => void) {
 const canAnimate = () => hasWebGL() && !window.matchMedia(REDUCED).matches;
 const canAnimateOnServer = () => false;
 
+/** true jika WebGL tersedia dan pengunjung tidak memakai prefers-reduced-motion. */
+export function useCanAnimateShader() {
+  return useSyncExternalStore(subscribeMotion, canAnimate, canAnimateOnServer);
+}
+
+/** Versi di luar React (misalnya untuk memutuskan apa yang dimuat di awal). */
+export function canAnimateShader() {
+  return typeof window !== "undefined" && canAnimate();
+}
+
 export function useShaderGate(ref: RefObject<HTMLElement | null>, idleTimeout = 2500) {
-  const animate = useSyncExternalStore(subscribeMotion, canAnimate, canAnimateOnServer);
+  const animate = useCanAnimateShader();
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
