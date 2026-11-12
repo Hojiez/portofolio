@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ProjectDetail } from "./ProjectDetail";
 import { CATEGORIES, PROJECTS, type Category, type Project } from "@/content/site";
 import { GuideSeat } from "@/components/guide/GuideSeat";
 import { Icon, ICON } from "@/components/ui/Icon";
@@ -31,10 +32,27 @@ function spanFor(i: number, n: number) {
   return `${span}${smLast}`;
 }
 
-function ProjectCard({ p, index, featured }: { p: Project; index: number; featured: boolean }) {
+function ProjectCard({
+  p,
+  index,
+  featured,
+  onOpen,
+}: {
+  p: Project;
+  index: number;
+  featured: boolean;
+  onOpen: () => void;
+}) {
   return (
     <TiltCard className="h-full">
-      <article data-mochi-curious className={`flex h-full flex-col ${featured ? "p-8 sm:p-10" : "p-6"}`}>
+      {/* klik di mana saja pada kartu (kecuali link Live/Code) membuka panel detail */}
+      <article
+        data-mochi-curious
+        onClick={(e) => {
+          if (p.details && !(e.target instanceof Element && e.target.closest("a, button"))) onOpen();
+        }}
+        className={`flex h-full flex-col ${p.details ? "cursor-pointer" : ""} ${featured ? "p-8 sm:p-10" : "p-6"}`}
+      >
         {p.media && (
           // animasi demo; pengunjung dengan prefers-reduced-motion melihat poster diam
           <picture className="mb-5 block overflow-hidden rounded-xl border border-line bg-ink">
@@ -85,8 +103,21 @@ function ProjectCard({ p, index, featured }: { p: Project; index: number; featur
           ))}
         </ul>
 
-        {(p.liveUrl || p.repoUrl) && (
-          <div className="mt-6 flex gap-5 border-t border-line pt-4 text-sm">
+        {(p.liveUrl || p.repoUrl || p.details) && (
+          <div className="mt-6 flex items-center gap-5 border-t border-line pt-4 text-sm">
+            {p.details && (
+              <button
+                type="button"
+                onClick={onOpen}
+                className={`group/details mr-auto inline-flex items-center gap-1.5 rounded font-medium text-fg ${FOCUS}`}
+              >
+                Details
+                <span aria-hidden="true" className="transition-transform group-hover/details:translate-x-0.5">
+                  →
+                </span>
+                <span className="sr-only"> about {p.title}</span>
+              </button>
+            )}
             {p.liveUrl && (
               <a
                 href={p.liveUrl}
@@ -203,6 +234,8 @@ export function Projects() {
   const visibleProjects =
     filter === "All" ? PROJECTS : PROJECTS.filter((p) => p.category === filter);
   const { pinRef, trackRef, countRef, barRef } = useHorizontalPin(visibleProjects.length);
+  const [openProject, setOpenProject] = useState<Project | null>(null);
+  const closeProject = useCallback(() => setOpenProject(null), []);
 
   return (
     <section id="projects" className="mx-auto max-w-6xl scroll-mt-28 px-6 py-24 sm:py-32">
@@ -246,7 +279,12 @@ export function Projects() {
             {visibleProjects.map((p, i) => (
               <li key={p.title} className={spanFor(i, visibleProjects.length)}>
                 <Reveal step={Math.min(i, 3)} className="h-full">
-                  <ProjectCard p={p} index={PROJECTS.indexOf(p)} featured={i === 0 && visibleProjects.length > 2} />
+                  <ProjectCard
+                p={p}
+                index={PROJECTS.indexOf(p)}
+                featured={i === 0 && visibleProjects.length > 2}
+                onOpen={() => setOpenProject(p)}
+              />
                 </Reveal>
               </li>
             ))}
@@ -266,6 +304,9 @@ export function Projects() {
       {visibleProjects.length === 0 && (
         <p className={`rounded-2xl p-8 text-center text-muted ${PANEL}`}>Nothing in this category yet.</p>
       )}
+
+      {/* panel detail project yang sedang dibuka */}
+      <ProjectDetail project={openProject} onClose={closeProject} />
     </section>
   );
 }

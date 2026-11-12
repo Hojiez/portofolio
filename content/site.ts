@@ -77,6 +77,25 @@ export type Project = {
   // opsional — animasi demo (WebP berulang) di public/projects/, ditambah
   // poster diam untuk pengunjung yang mematikan animasi. Ukuran 800×500.
   media?: { src: string; poster: string; alt: string };
+  // opsional — isi panel detail yang terbuka saat kartu project diklik
+  details?: ProjectDetails;
+};
+
+export type ProjectDetails = {
+  /** satu paragraf: apa project ini dan untuk siapa */
+  overview: string;
+  /** cara dibuat: keputusan teknis dan bagian-bagiannya */
+  built: string[];
+  /** fitur yang paling menarik untuk ditunjukkan */
+  highlights?: string[];
+  // >>> GANTI DENGAN DATA KAMU: tiga kolom di bawah ini hanya kamu yang tahu.
+  //     Kosongkan (hapus barisnya) dan bagiannya tidak tampil di panel.
+  /** peranmu di project ini (terutama untuk project tim) */
+  role?: string;
+  /** bagian yang paling sulit dan bagaimana kamu menyelesaikannya */
+  challenge?: string;
+  /** apa yang kamu pelajari */
+  learned?: string;
 };
 
 // >>> GANTI DENGAN DATA KAMU: daftar project
@@ -89,6 +108,20 @@ export const PROJECTS: Project[] = [
     tech: ["Node.js", "Express", "PostgreSQL", "JWT", "Midtrans", "Gemini API"],
     liveUrl: "https://app-database-new.vercel.app",
     repoUrl: "https://github.com/Hojiez/app-database-new",
+    details: {
+      overview:
+        "An online furniture store with three kinds of users: customers who browse, order and pay, cashiers who handle in-store sales, and an admin who runs the shop.",
+      built: [
+        "Express REST API deployed on Vercel as a serverless function, with PostgreSQL behind it.",
+        "JWT login with role checks on every route, so customers, cashiers and the admin each see only their own endpoints.",
+        "Midtrans for online payments; cash orders wait for a cashier to confirm them.",
+        "Google Gemini writes sales-trend notes for the admin, with a fallback message when the API fails or returns something unusable.",
+      ],
+      highlights: [
+        "Admin dashboard with revenue trend, top-selling products and AI sales insights.",
+        "Customers can track orders, see their history and leave reviews.",
+      ],
+    },
   },
   {
     title: "Toko Sumber Makmur POS",
@@ -97,6 +130,15 @@ export const PROJECTS: Project[] = [
     category: "Web",
     tech: ["Vue 3", "Laravel 11", "SQLite"],
     // tidak ada repo publik atau demo: proyek untuk toko sungguhan
+    details: {
+      overview:
+        "A point-of-sale system for Toko Sumber Makmur, a neighborhood grocery store. Built by a BINUS team for a real shop rather than a made-up brief.",
+      built: [
+        "Vue 3 frontend for the checkout screens.",
+        "Laravel 11 backend with an SQLite database.",
+      ],
+      highlights: ["I went to the shop in person to see how the owner sells and keeps track of stock before the system was built."],
+    },
   },
   {
     title: "Furniture Store (Go)",
@@ -105,6 +147,14 @@ export const PROJECTS: Project[] = [
     category: "Backend",
     tech: ["Go", "Gin", "MySQL", "HTML"],
     repoUrl: "https://github.com/Hojiez/app_database_perabotan_golang",
+    details: {
+      overview: "The furniture store backend rewritten in Go, to see how the same API looks in a compiled, typed language.",
+      built: [
+        "Gin web framework with the MySQL driver.",
+        "Endpoints for login, product CRUD and transactions.",
+        "Admin stats, revenue trend and top-selling queries ported from the Node.js version.",
+      ],
+    },
   },
   {
     title: "Furniture Store",
@@ -113,6 +163,14 @@ export const PROJECTS: Project[] = [
     category: "Backend",
     tech: ["Node.js", "Express", "PostgreSQL", "HTML"],
     repoUrl: "https://github.com/Hojiez/app_database_perabotan",
+    details: {
+      overview: "The first version of the furniture store: a CRUD app with a REST API and a plain HTML page on top.",
+      built: [
+        "Express and PostgreSQL, with parameterized queries throughout.",
+        "Checkout runs inside a database transaction (BEGIN, COMMIT, ROLLBACK), so a failed order never leaves stock half-updated.",
+        "Case-insensitive product search.",
+      ],
+    },
   },
   {
     title: "Stroke Rehab",
@@ -121,6 +179,16 @@ export const PROJECTS: Project[] = [
     category: "Web",
     tech: ["Java", "Spring Boot", "Thymeleaf", "MySQL"],
     repoUrl: "https://github.com/Hojiez/rehab",
+    details: {
+      overview:
+        "NeuroMotion: a web app that helps stroke patients follow their rehab exercises and lets staff see how they are doing.",
+      built: [
+        "Spring Boot MVC with server-rendered Thymeleaf pages and MySQL.",
+        "Patient registration, login and profile pages.",
+        "Exercises with a history of completed sessions and feedback after each one.",
+      ],
+      highlights: ["An SOS alert page for patients.", "An admin panel that can reset weekly progress for everyone."],
+    },
   },
   {
     title: "Expo Assignment",
@@ -135,6 +203,14 @@ export const PROJECTS: Project[] = [
       poster: "/projects/expo-poster.webp",
       alt: "The Expo app on a phone screen, switching between the Home, About and Simple tabs",
     },
+    details: {
+      overview: "Coursework for a mobile development class: a small React Native app to learn navigation in Expo.",
+      built: [
+        "Expo Router with a tab layout (Home and About) and a separate stack screen.",
+        "TypeScript throughout.",
+        "Exported to a static web build and deployed on Vercel, so it runs in a browser too.",
+      ],
+    },
   },
   {
     title: "Fish Watcher",
@@ -143,6 +219,16 @@ export const PROJECTS: Project[] = [
     category: "Tools",
     tech: ["Python", "Playwright", "CustomTkinter"],
     repoUrl: "https://github.com/Hojiez/fish-watcher",
+    details: {
+      overview:
+        "A desktop helper for a Roblox game: it watches a Discord channel for server announcements and joins the right server for you.",
+      built: [
+        "Playwright reads the Discord channel in a browser it controls.",
+        "The watcher runs on its own thread with asyncio, so the window never freezes.",
+        "A CustomTkinter window to start and stop watching, with settings saved locally.",
+      ],
+      highlights: ["Joins the Roblox server by its place ID and sends a desktop notification when it does."],
+    },
   },
   {
     title: "rauh. — Old Portfolio",
@@ -156,6 +242,14 @@ export const PROJECTS: Project[] = [
       src: "/projects/old-portfolio.webp",
       poster: "/projects/old-portfolio-poster.webp",
       alt: "Scrolling through the old portfolio: profile card, tech stack and project list on a dark particle background",
+    },
+    details: {
+      overview: "My previous portfolio, before this one: a single dark page hosted on GitHub Pages.",
+      built: [
+        "Plain HTML, Tailwind CSS and JavaScript, no framework.",
+        "A particle background and frosted-glass panels.",
+        "A click-to-enter screen that starts a music player on shuffle.",
+      ],
     },
   },
 ];
