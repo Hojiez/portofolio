@@ -89,7 +89,7 @@ const ABOUT = {
 
 // Kategori filter project. Boleh diganti, tapi "All" harus tetap ada di depan.
 // >>> GANTI DENGAN DATA KAMU (opsional): daftar kategori
-const CATEGORIES = ["All", "Web", "AI", "Blockchain", "Game"] as const;
+const CATEGORIES = ["All", "Web", "Backend", "Mobile", "Tools"] as const;
 type Category = (typeof CATEGORIES)[number];
 
 type Project = {
@@ -104,54 +104,62 @@ type Project = {
 // >>> GANTI DENGAN DATA KAMU: daftar project
 const PROJECTS: Project[] = [
   {
-    title: "Project Satu",
+    title: "Toko Perabotan (v2)",
     description:
-      "Deskripsi singkat: masalah apa yang diselesaikan dan apa peranmu di dalamnya.",
+      "Aplikasi web toko perabotan full-stack dengan login JWT, pembayaran via Midtrans, dan fitur AI berbasis Google Gemini.",
     category: "Web",
-    tech: ["Next.js", "TypeScript", "Tailwind"],
-    liveUrl: "https://contoh.com",
-    repoUrl: "https://github.com/username-kamu/project-satu",
+    tech: ["Node.js", "Express", "PostgreSQL", "JWT", "Midtrans", "Gemini API"],
+    liveUrl: "https://app-database-new.vercel.app",
+    repoUrl: "https://github.com/Hojiez/app-database-new",
   },
   {
-    title: "Project Dua",
+    title: "Toko Perabotan (Go)",
     description:
-      "Deskripsi singkat: masalah apa yang diselesaikan dan apa peranmu di dalamnya.",
-    category: "AI",
-    tech: ["Python", "PyTorch", "FastAPI"],
-    repoUrl: "https://github.com/username-kamu/project-dua",
+      "Versi backend aplikasi toko perabotan yang ditulis ulang dengan Go dan framework Gin, terhubung ke database MySQL.",
+    category: "Backend",
+    tech: ["Go", "Gin", "MySQL", "HTML"],
+    repoUrl: "https://github.com/Hojiez/app_database_perabotan_golang",
   },
   {
-    title: "Project Tiga",
+    title: "Toko Perabotan",
     description:
-      "Deskripsi singkat: masalah apa yang diselesaikan dan apa peranmu di dalamnya.",
-    category: "Blockchain",
-    tech: ["Solidity", "Hardhat", "ethers.js"],
-    repoUrl: "https://github.com/username-kamu/project-tiga",
+      "Aplikasi CRUD database toko perabotan dengan REST API Express dan PostgreSQL, plus antarmuka web sederhana.",
+    category: "Backend",
+    tech: ["Node.js", "Express", "PostgreSQL", "HTML"],
+    repoUrl: "https://github.com/Hojiez/app_database_perabotan",
   },
   {
-    title: "Project Empat",
+    title: "Rehab Stroke",
     description:
-      "Deskripsi singkat: masalah apa yang diselesaikan dan apa peranmu di dalamnya.",
-    category: "Game",
-    tech: ["Unity", "C#"],
-    liveUrl: "https://contoh.com",
-  },
-  {
-    title: "Project Lima",
-    description:
-      "Deskripsi singkat: masalah apa yang diselesaikan dan apa peranmu di dalamnya.",
+      "Aplikasi web untuk pengelolaan data rehabilitasi pasien stroke, dibangun dengan Spring Boot, Thymeleaf, dan MySQL.",
     category: "Web",
-    tech: ["React", "Node.js", "PostgreSQL"],
-    liveUrl: "https://contoh.com",
-    repoUrl: "https://github.com/username-kamu/project-lima",
+    tech: ["Java", "Spring Boot", "Thymeleaf", "MySQL"],
+    repoUrl: "https://github.com/Hojiez/rehab",
   },
   {
-    title: "Project Enam",
+    title: "Tugas Expo",
     description:
-      "Deskripsi singkat: masalah apa yang diselesaikan dan apa peranmu di dalamnya.",
-    category: "AI",
-    tech: ["LangChain", "OpenAI API", "Supabase"],
-    repoUrl: "https://github.com/username-kamu/project-enam",
+      "Aplikasi mobile React Native dengan Expo Router dan navigasi tab, dibuat sebagai tugas pengembangan aplikasi mobile.",
+    category: "Mobile",
+    tech: ["React Native", "Expo", "TypeScript"],
+    repoUrl: "https://github.com/Hojiez/tugas-expo",
+  },
+  {
+    title: "Fish Watcher",
+    description:
+      "Aplikasi desktop yang memantau pesan Discord dan otomatis bergabung ke server Roblox, dengan GUI dan notifikasi desktop.",
+    category: "Tools",
+    tech: ["Python", "Playwright", "CustomTkinter"],
+    repoUrl: "https://github.com/Hojiez/fish-watcher",
+  },
+  {
+    title: "rauh. — Portfolio Lama",
+    description:
+      "Portfolio single-page bergaya dark minimalist dengan glassmorphism, background partikel, dan pemutar musik acak.",
+    category: "Web",
+    tech: ["HTML", "Tailwind CSS", "JavaScript"],
+    liveUrl: "https://hojiez.github.io/porto/",
+    repoUrl: "https://github.com/Hojiez/porto",
   },
 ];
 
