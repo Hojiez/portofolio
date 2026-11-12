@@ -195,24 +195,35 @@ body {
   to { opacity: 1; }
 }
 
-/* Bola logam yang menjadi scroll bar dan kursor (components/layout/MetalOrb.tsx).
-   Kursor asli disembunyikan selama bola menjadi kursor, kecuali di kolom
-   ketik. Bola muncul memudar setelah posisinya pertama kali dihitung. */
+/* Bola logam yang menjadi scroll bar (components/layout/MetalOrb.tsx). Muncul
+   memudar setelah posisinya pertama kali dihitung. */
 .metal-orb {
   opacity: 0;
   transform-origin: 50% 50%;
   will-change: transform;
   transition: opacity 400ms ease;
 }
-.metal-orb:not(.orb-shown) {
-  opacity: 0 !important;
+.metal-orb.orb-shown {
+  opacity: 1;
 }
-html.orb-cursor,
-html.orb-cursor * {
+
+/* Kursor logam (components/layout/MetalCursor.tsx): kursor asli disembunyikan
+   selama kursor logam tampil, kecuali di kolom ketik (input/textarea). */
+.metal-cursor {
+  transform-origin: 50% 50%;
+  will-change: transform;
+  transition: opacity 200ms ease;
+}
+.metal-cursor > * {
+  opacity: var(--cursor-alpha, 1);
+  transition: opacity 200ms ease;
+}
+html.metal-cursor-on,
+html.metal-cursor-on * {
   cursor: none !important;
 }
-html.orb-cursor input,
-html.orb-cursor textarea {
+html.metal-cursor-on input,
+html.metal-cursor-on textarea {
   cursor: text !important;
 }
 

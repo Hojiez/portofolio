@@ -9,7 +9,7 @@ import { Mascot, type MascotLook } from "@/components/guide/Mascot";
 import { useCanAnimateShader } from "@/components/ui/useShaderGate";
 import dynamic from "next/dynamic";
 import { preloadIntroAssets } from "./preload";
-import { setSoundOn, useSoundOn } from "@/components/guide/soundPref";
+import { setSoundOn, useSoundChoice, useSoundOn } from "@/components/guide/soundPref";
 import { FOCUS } from "@/components/ui/styles";
 import { introShouldShow, markIntroSeen } from "./introState";
 import { sfxBlob, sfxCheck, sfxEnter, sfxKey, sfxReady, sfxToggleOn, unlockAudio } from "./sfx";
@@ -139,7 +139,12 @@ export function Terminal() {
   const [phase, setPhase] = useState<"loading" | "gate" | "intro">("loading");
   const phaseRef = useRef<"loading" | "gate" | "intro">("loading");
   const startRef = useRef<(() => void) | null>(null);
-  const gateRef = useRef<HTMLButtonElement>(null);
+  const gateRef = useRef<HTMLButtonElement>(null); // "Enter with sound"
+  // Pengunjung yang terakhir memilih tanpa suara: tombol Enter di keyboard
+  // (saat fokus tidak di salah satu tombol gerbang) masuk tanpa suara,
+  // supaya suara tidak menyala sendiri.
+  const preferMuted = useSoundChoice() === "off";
+  const preferMutedRef = useRef(preferMuted);
   const [load, setLoad] = useState(0); // persen aset yang sudah dimuat
   const [loaderLook, setLoaderLook] = useState<MascotLook>({ x: 0, y: 0 });
   const [metalDone, setMetalDone] = useState(false); // shader kotak logam boleh dilepas
@@ -273,19 +278,26 @@ export function Terminal() {
   }, []);
 
   useEffect(() => {
+    preferMutedRef.current = preferMuted;
+  }, [preferMuted]);
+
+  useEffect(() => {
     phaseRef.current = phase;
     // gerbang muncul: fokus ke tombol utama supaya pengguna keyboard siap
     if (phase === "gate") gateRef.current?.focus({ preventScroll: true });
   }, [phase]);
 
-  // Enter: di gerbang = masuk dengan suara; di terminal = menutup intro
-  // (kecuali saat fokus di tombol lain: tombol itu yang menangani).
+  // Enter: di gerbang = masuk sesuai pilihan suara terakhir; di terminal =
+  // menutup intro (kecuali saat fokus di tombol lain: tombol itu yang
+  // menangani). Setelah intro selesai, Enter dibiarkan apa adanya supaya
+  // link dan tombol di halaman tetap bisa dibuka dengan keyboard.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Enter") return;
+      if (document.documentElement.getAttribute("data-intro") !== "show") return;
       if (e.target instanceof HTMLButtonElement && e.target !== enterRef.current) return;
       e.preventDefault();
-      if (phaseRef.current === "gate") enter(true);
+      if (phaseRef.current === "gate") enter(!preferMutedRef.current);
       else if (phaseRef.current === "intro") close();
     };
     window.addEventListener("keydown", onKey);

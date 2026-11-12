@@ -55,3 +55,19 @@ export function subscribeSound(onChange: () => void) {
 export function useSoundOn() {
   return useSyncExternalStore(subscribeSound, read, () => false);
 }
+
+/* Pilihan yang tersimpan: "on", "off", atau null jika pengunjung belum pernah
+   memilih. Dipakai gerbang intro supaya tombol Enter mengikuti pilihan
+   terakhir, bukan selalu menyalakan suara. */
+function readChoice(): "on" | "off" | null {
+  try {
+    const v = localStorage.getItem(KEY);
+    return v === "on" || v === "off" ? v : null;
+  } catch {
+    return memory === null ? null : memory ? "on" : "off";
+  }
+}
+
+export function useSoundChoice() {
+  return useSyncExternalStore(subscribeSound, readChoice, () => null);
+}

@@ -8,6 +8,7 @@ import { Terminal } from "@/components/intro/Terminal";
 import { INTRO_SCRIPT } from "@/components/intro/introState";
 import { Background } from "@/components/layout/Background";
 import { Footer } from "@/components/layout/Footer";
+import { MetalCursor } from "@/components/layout/MetalCursor";
 import { MetalOrb } from "@/components/layout/MetalOrb";
 import { Navbar } from "@/components/layout/Navbar";
 import { About } from "@/components/sections/About";
@@ -32,7 +33,7 @@ export default function Page() {
       >
         <Background />
         <Navbar />
-        {/* bola logam: di hero, lalu jadi scroll bar dan kursor */}
+        {/* bola logam: di hero, lalu jadi scroll bar */}
         <MetalOrb />
         {/* Mochi melayang di atas isi halaman, dari kursi ke kursi */}
         <Guide />
@@ -51,6 +52,9 @@ export default function Page() {
       {/* Ctrl/⌘+K: perintah cepat; notifikasi kecil di bawah layar */}
       <CommandPalette />
       <Toaster />
+      {/* kursor logam (hanya perangkat bermouse); di luar #page supaya juga
+          tampil di atas intro */}
+      <MetalCursor />
     </>
   );
 }

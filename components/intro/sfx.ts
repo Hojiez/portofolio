@@ -10,7 +10,7 @@
  *     langsung terdengar.
  */
 
-import { isSoundOn, SITE_VOLUME } from "@/components/guide/soundPref";
+import { isSoundOn, SITE_VOLUME, subscribeSound } from "@/components/guide/soundPref";
 
 let ctx: AudioContext | null = null;
 let master: GainNode | null = null;
@@ -23,8 +23,13 @@ function audio() {
     if (!AC) return null;
     ctx = new AC();
     master = ctx.createGain();
-    master.gain.value = SITE_VOLUME;
+    master.gain.value = isSoundOn() ? SITE_VOLUME : 0;
     master.connect(ctx.destination);
+    // Suara dimatikan: bunyi yang sudah terjadwal (dengung kotak logam,
+    // chord pembuka) ikut langsung senyap, tidak dibiarkan selesai.
+    subscribeSound(() => {
+      if (master && ctx) master.gain.setTargetAtTime(isSoundOn() ? SITE_VOLUME : 0, ctx.currentTime, 0.03);
+    });
     // potongan derau putih pendek, dipakai untuk bunyi tuts
     noise = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.05), ctx.sampleRate);
     const data = noise.getChannelData(0);
