@@ -23,20 +23,31 @@ import json
 import pathlib
 import re
 import subprocess
+import sys
 
 import soundfile as sf
 from kokoro_onnx import Kokoro
 
+sys.path.insert(0, str(pathlib.Path(__file__).parent))
+from effects import babble  # noqa: E402
+
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 HERE = ROOT / "scripts" / "voice"
 
-# Suara dan kecepatan yang dipakai untuk file final (dipilih dari contoh A).
+# Jenis suara Mochi untuk file final:
+#   "babble" — bahasa "Mochi": celoteh blip tanpa kata (dipilih, contoh 7)
+#   "tts"    — kalimat diucapkan Kokoro dengan suara VOICE (dipakai sebelumnya)
+MODE = "babble"
+BABBLE_HZ = 520.0  # nada dasar celoteh; lebih kecil = lebih rendah (contoh 8: 330)
+
+# Suara dan kecepatan untuk MODE = "tts".
 VOICE = "af_heart"
 SPEED = 1.0
 
 # Ejaan khusus untuk TTS saja (teks di situs tidak berubah), karena nama-nama
 # ini dibaca salah oleh Kokoro:
-#   Rauh   -> tanpa ini dibaca "raw"      (ɹˈɔː)    ; jadi "ra-uh"  (ɹˈɑːˈʌ)
+#   Rauh   -> dibaca "Ra'uh" (kata pemiliknya); tanpa ini dibaca "raw" (ɹˈɔː),
+#             dengan ini jadi "ra-uh" (ɹˈɑːˈʌ)
 #   Hessed -> tanpa ini dibaca "hest"     (hˈɛst)   ; jadi "he-set" (hˈɛsɛt)
 #   Mochi  -> tanpa ini dibaca "ma-chai"  (mˈɑːtʃaɪ); jadi "mo-chi" (mˈoʊtʃiː)
 PRONOUNCE: dict[str, str] = {
@@ -89,7 +100,13 @@ def main() -> None:
     for seat, line in lines.items():
         # line["voice"] berbentuk "/voice/hero.mp3" -> public/voice/hero.mp3
         path = ROOT / "public" / line["voice"].lstrip("/")
-        secs = render(kokoro, line["text"], VOICE, SPEED, path)
+        if MODE == "babble":
+            samples, rate = babble(line["text"], base_hz=BABBLE_HZ)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            sf.write(path, samples, rate, format="MP3")
+            secs = len(samples) / rate
+        else:
+            secs = render(kokoro, line["text"], VOICE, SPEED, path)
         print(f"{seat:9} {secs:4.1f} s  {path.relative_to(ROOT)}")
 
 
