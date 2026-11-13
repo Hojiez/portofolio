@@ -24,16 +24,16 @@ const SCENES = [
   {
     tag: "kid",
     caption:
-      "I started with game cheats. I wanted god mode, so I wrote it myself.",
+      "It started with game cheats. I wanted god mode, so I wrote it myself.",
   },
   {
     tag: "high school",
     caption:
-      "In high school I got curious about the other side: how anti-cheat catches people like me.",
+      "Then I wondered how anti-cheat catches kids like me, and started reading about game security.",
   },
   {
     tag: "university",
-    caption: `Now at BINUS I build real software. ${PROJECTS.length} projects so far, and counting.`,
+    caption: `Now I'm at BINUS, building software people use. ${PROJECTS.length} projects so far.`,
   },
 ] as const;
 

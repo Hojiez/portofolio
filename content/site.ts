@@ -43,11 +43,11 @@ export const SOCIALS: { label: string; href: string }[] = [
 
 export const ABOUT = {
   // >>> GANTI DENGAN DATA KAMU: kalimat pembuka besar di About (ringkasan bio)
-  headline: "I learned to code by writing game cheats. Now I build apps for shops that still keep their records on paper.",
+  headline: "I got into code to cheat at games. I stayed because building things for real people turned out to be more fun.",
   // >>> GANTI DENGAN DATA KAMU: bio — tiap string = satu paragraf
   bio: [
-    "I study Computer Science at BINUS University Malang. My first programs were cheats for the games I played as a kid. In high school I got curious about the other side, how games catch cheaters, and started digging into game security.",
-    "I still like small tools that fix one annoying thing, like external helpers that make a game easier to play. I also like projects with a real person on the other end, such as moving a traditional shop's records into a proper database. Right now I'm studying operating systems and compiler construction. Cybersecurity is next.",
+    "I'm a Computer Science student at BINUS University Malang, from Balikpapan. As a kid I wanted to win without the grind, so I taught myself to write cheats. By high school the question had flipped: how do games catch people like me? That's how I ended up reading about anti-cheat and game security.",
+    "Now my projects come in two sizes. Small tools that fix one annoying thing, and bigger apps with an actual person on the other end, like the point-of-sale system my team built after I visited a neighborhood grocery store to see how the owner tracks sales and stock. This semester it's operating systems and compiler construction. Cybersecurity is where I want to go next.",
   ],
   // >>> GANTI DENGAN DATA KAMU: angka sorotan (maksimal 4 supaya rapi)
   // (dibuat sebagai getter supaya jumlah project otomatis mengikuti PROJECTS)
