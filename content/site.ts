@@ -127,6 +127,8 @@ export const PROJECTS: Project[] = [
       role: LEAD,
       challenge:
         "Keeping three roles apart. Every route has to know who is calling, so the JWT check lives in middleware with a list of allowed roles per route instead of being repeated in each handler. Gemini was the other tricky part: when its reply crashes or doesn't parse, the dashboard shows a fallback message instead of breaking.",
+      learned:
+        "Treat every outside service as something that will fail. Payments and AI replies both needed a plan for when they don't come back right, and that plan took more code than the happy path.",
     },
   },
   {
@@ -147,6 +149,8 @@ export const PROJECTS: Project[] = [
       role: LEAD,
       challenge:
         "Building for a real person instead of a class brief. What the owner actually does at the counter decided the screens and the database, so the visit to the shop came before any design.",
+      learned:
+        "Watch the user before you design anything. One afternoon at the counter told us more than any feature list, and leading the team taught me to split work so nobody waits on someone else.",
     },
   },
   {
@@ -166,6 +170,8 @@ export const PROJECTS: Project[] = [
       role: LEAD,
       challenge:
         "Porting from JavaScript to Go. Every database row needs an explicit type and every call returns an error to handle, where the Node.js version let those slide.",
+      learned:
+        "Writing the same API twice showed me which parts were the design and which were just JavaScript habits. Go's explicit errors made me notice failure cases I had ignored the first time.",
     },
   },
   {
@@ -185,6 +191,8 @@ export const PROJECTS: Project[] = [
       role: LEAD,
       challenge:
         "Checkout touches several tables at once. If one write failed halfway, stock could end up wrong, so the whole checkout runs in a single transaction and rolls back on any error.",
+      learned:
+        "How transactions and parameterized queries work in practice, and why both belong in the first version instead of being added later.",
     },
   },
   {
@@ -206,6 +214,8 @@ export const PROJECTS: Project[] = [
       role: LEAD,
       challenge:
         "Separating weekly progress from history. Exercise history is stored in its own table, so the admin can reset everyone's week without losing what patients have done before.",
+      learned:
+        "Database design decides what features are easy later. Keeping history in its own table made the weekly reset one query instead of a risky cleanup.",
     },
   },
   {
@@ -231,6 +241,8 @@ export const PROJECTS: Project[] = [
       role: LEAD,
       challenge:
         "Learning file-based routing: in Expo Router the folder structure is the navigation, so getting tabs and a stack screen to share one layout meant planning the folders first.",
+      learned:
+        "How mobile navigation differs from the web, and that one React Native codebase can also ship as a website with a static export.",
     },
   },
   {
@@ -252,6 +264,8 @@ export const PROJECTS: Project[] = [
       role: LEAD,
       challenge:
         "Keeping the window responsive. The watcher runs its own asyncio loop on a separate thread and sends updates back to the GUI through a thread-safe callback, because Tkinter freezes if anything else touches it directly.",
+      learned:
+        "Threads and async loops, the hard way. A GUI has one thread it trusts, and everything else has to send it messages instead of touching it.",
     },
   },
   {
@@ -277,6 +291,8 @@ export const PROJECTS: Project[] = [
       role: LEAD,
       challenge:
         "Getting music to play at all. Browsers block audio until the visitor interacts with the page, which is why the site opens with a click-to-enter screen.",
+      learned:
+        "Browser rules shape the design. The autoplay block turned into the site's intro, and the same trick opens this portfolio.",
     },
   },
 ];
